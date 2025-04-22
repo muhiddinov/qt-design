@@ -16,18 +16,28 @@ class PixelClockWindow(QWidget):
             sys.exit(1)
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         font = QFont(font_family)
-        font.setPixelSize(500)  # Shrfit o'lchami
+        font.setPixelSize(400)  # Shrfit o'lchami
 
         # Label yaratish
-        self.label = QLabel(self)
-        self.label.setFont(font)
-        self.label.setStyleSheet("color: red; background-color: black;")
-        self.label.setAlignment(Qt.AlignCenter)
-        self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
+        self.lbl_timer = QLabel(self)
+        self.lbl_timer.setFont(font)
+        self.lbl_timer.setStyleSheet("color: red; background-color: black;")
+        self.lbl_timer.setAlignment(Qt.AlignCenter)
+        self.lbl_timer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        
+         # Label yaratish
+        self.lbl_value = QLabel(self)
+        font.setPixelSize(200)
+        self.lbl_value.setFont(font)
+        self.lbl_value.setStyleSheet("color: red; background-color: black;")
+        self.lbl_value.setAlignment(Qt.AlignCenter)
+        self.lbl_value.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.lbl_value.setText("Pixel Clock")
+        
         # Layout
         layout = QVBoxLayout()
-        layout.addWidget(self.label)
+        layout.addWidget(self.lbl_timer)
+        layout.addWidget(self.lbl_value)
         self.setLayout(layout)
 
         # Timer — har soniyada vaqtni yangilash
@@ -40,7 +50,7 @@ class PixelClockWindow(QWidget):
 
     def update_time(self):
         current_time = QTime.currentTime().toString("mm:ss")
-        self.label.setText(current_time)
+        self.lbl_timer.setText(current_time)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
