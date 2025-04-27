@@ -12,6 +12,7 @@ class DataBase():
             cursor = self.connection.cursor()
             cursor.execute("SELECT * from relays")
             if cursor.fetchone() is None:
+                self.create_tables()
                 self.insert_default_data()
         self.connection.close()
 
@@ -37,6 +38,7 @@ class DataBase():
         self.connection = sqlite3.connect(self.db_path)
 
     def create_tables(self) -> None:
+        self.connect()
         cursor = self.connection.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS carwash (
@@ -58,8 +60,10 @@ class DataBase():
             )
         ''')
         self.connection.commit()
+        self.connection.close()
         
     def insert_default_data(self) -> None:
+        self.connect()
         cursor = self.connection.cursor()
         cursor.execute("INSERT INTO relays (name, port, status, on_time, off_time, price) VALUES ('Relay 1', 27, 0, 800, 200, 2000.0)")
         cursor.execute("INSERT INTO relays (name, port, status, on_time, off_time, price) VALUES ('Relay 2', 22, 0, 800, 200, 2000.0)")
@@ -72,6 +76,7 @@ class DataBase():
         cursor.execute("INSERT INTO relays (name, port, status, on_time, off_time, price) VALUES ('Relay 9', 19, 0, 800, 200, 2000.0)")
         cursor.execute("INSERT INTO relays (name, port, status, on_time, off_time, price) VALUES ('Relay 10', 26, 0, 800, 200, 2000.0)")
         self.connection.commit()
+        self.connection.close()
     
     def get_database(self):
         return self.connection
