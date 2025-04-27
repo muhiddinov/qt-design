@@ -2,7 +2,7 @@ import sqlite3
 import os
 
 class DataBase():
-    def __init__(self, db_path: str = "carwash.db") -> None:
+    def __init__(self, db_path: str = "assets/carwash.db") -> None:
         self.db_path = db_path
         self.connection = sqlite3.connect(self.db_path)
         if not os.path.exists(self.db_path):

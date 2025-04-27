@@ -3,7 +3,6 @@ import RPi.GPIO as GPIO
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QSizePolicy
 from PyQt5.QtGui import QFontDatabase, QFont
 from PyQt5.QtCore import Qt, QTimer, QTime
-from time import sleep
 
 class ProcessWindow(QWidget):
     def __init__(self):
@@ -32,11 +31,11 @@ class ProcessWindow(QWidget):
             GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
         # Interrupt pinni sozlash
-        GPIO.setup(self.interrupt_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.interrupt_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.add_event_detect(self.interrupt_pin, GPIO.FALLING, callback=self.handle_interrupt, bouncetime=50)
 
         # Pixel shriftni yuklash
-        font_id = QFontDatabase.addApplicationFont("Pixel Emulator.otf")
+        font_id = QFontDatabase.addApplicationFont("assets/Pixel Emulator.otf")
         if font_id == -1:
             print("Shrift yuklanmadi. .ttf fayl mavjudligini tekshiring.")
             sys.exit(1)
@@ -57,7 +56,7 @@ class ProcessWindow(QWidget):
         self.lbl_value.setStyleSheet("color: red; background-color: black;")
         self.lbl_value.setAlignment(Qt.AlignCenter)
         self.lbl_value.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.lbl_value.setText("Pixel Clock")
+        self.lbl_value.setText("")
 
         # Layout
         layout = QVBoxLayout()
@@ -75,11 +74,6 @@ class ProcessWindow(QWidget):
 
         # Dastlabki vaqtni yangilash
         self.update_time()
-        # for pin in self.output_pins:
-        #     GPIO.setup(pin, GPIO.OUT)
-        #     GPIO.output(pin, GPIO.HIGH)
-        #     sleep(1)
-        #     GPIO.output(pin, GPIO.LOW)
             
     def set_callback(self, callback):
         self.callback_function = callback
@@ -110,5 +104,5 @@ class ProcessWindow(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = ProcessWindow()
-    window.show()
+    window.showFullScreen()
     sys.exit(app.exec_())
