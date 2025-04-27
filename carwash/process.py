@@ -3,8 +3,9 @@ import RPi.GPIO as GPIO
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QSizePolicy
 from PyQt5.QtGui import QFontDatabase, QFont
 from PyQt5.QtCore import Qt, QTimer, QTime
+from time import sleep
 
-class PixelClockWindow(QWidget):
+class ProcessWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("LED Matrix Style Clock")
@@ -12,12 +13,15 @@ class PixelClockWindow(QWidget):
 
         # GPIO sozlamalari
         GPIO.setmode(GPIO.BCM)
-        self.output_pins = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11]  # Relay uchun chiquvchi pinlar
-        self.input_pins = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21]  # Tugmalar uchun kiruvchi pinlar
-        self.interrupt_pin = 22  # Interrupt uchun kiruvchi pin
+        self.output_pins = [27, 22, 10, 9, 11, 5, 6, 13, 19, 26]  # Relay uchun chiquvchi pinlar
+        self.input_pins = [2, 3, 18, 23, 24, 25, 8, 7, 12, 16, 20, 21]  # Tugmalar uchun kiruvchi pinlar
+        self.interrupt_pin = 21  # Interrupt uchun kiruvchi pin
         self.pulse_count = 0  # Pulslar soni
         self.summa = 0  # Umumiy summa
-
+        self.out_pwr_en = 17
+        
+        GPIO.setup(self.out_pwr_en, GPIO.OUT)
+        
         # Chiquvchi pinlarni sozlash
         for pin in self.output_pins:
             GPIO.setup(pin, GPIO.OUT)
@@ -29,10 +33,10 @@ class PixelClockWindow(QWidget):
 
         # Interrupt pinni sozlash
         GPIO.setup(self.interrupt_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.add_event_detect(self.interrupt_pin, GPIO.FALLING, callback=self.handle_interrupt, bouncetime=200)
+        GPIO.add_event_detect(self.interrupt_pin, GPIO.FALLING, callback=self.handle_interrupt, bouncetime=50)
 
         # Pixel shriftni yuklash
-        font_id = QFontDatabase.addApplicationFont("pixel_lcd_7.ttf")
+        font_id = QFontDatabase.addApplicationFont("Pixel Emulator.otf")
         if font_id == -1:
             print("Shrift yuklanmadi. .ttf fayl mavjudligini tekshiring.")
             sys.exit(1)
@@ -61,6 +65,9 @@ class PixelClockWindow(QWidget):
         layout.addWidget(self.lbl_value)
         self.setLayout(layout)
 
+        # callback funksiya
+        self.callback_function = None
+        
         # Timer — har soniyada vaqtni yangilash
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_time)
@@ -68,6 +75,14 @@ class PixelClockWindow(QWidget):
 
         # Dastlabki vaqtni yangilash
         self.update_time()
+        # for pin in self.output_pins:
+        #     GPIO.setup(pin, GPIO.OUT)
+        #     GPIO.output(pin, GPIO.HIGH)
+        #     sleep(1)
+        #     GPIO.output(pin, GPIO.LOW)
+            
+    def set_callback(self, callback):
+        self.callback_function = callback
 
     def update_time(self):
         current_time = QTime.currentTime().toString("mm:ss")
@@ -75,15 +90,11 @@ class PixelClockWindow(QWidget):
 
     def handle_interrupt(self, channel):
         # Interrupt pin orqali pulslarni hisoblash
+        if self.callback_function:
+            self.callback_function()
         self.pulse_count += 1
         self.summa += 1000  # Har bir puls uchun 1000 qo'shiladi
         self.lbl_value.setText(f"Summa: {self.summa}")
-
-        # Agar summa > 0 bo'lsa, tugmalarni tekshirish
-        if self.summa > 0:
-            for i, pin in enumerate(self.input_pins):
-                if GPIO.input(pin) == GPIO.HIGH:
-                    self.execute_task(i)
 
     def execute_task(self, task_index):
         # Tugma bosilganda bajariladigan vazifalar
@@ -98,6 +109,6 @@ class PixelClockWindow(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = PixelClockWindow()
+    window = ProcessWindow()
     window.show()
     sys.exit(app.exec_())
