@@ -26,16 +26,15 @@ class AdvertisingWindow(object):
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
 
-
         # Updated to use QWebEngineView
         self.webView = QWebEngineView(self.layoutWidget)
+        # self.webView.contextMenuEvent = lambda event: None  # Disable context menu
         self.webView.setUrl(QtCore.QUrl("https://www.youtube.com/watch?v=vr0htZlAQbk&feature=youtu.be"))
         self.webView.setObjectName("webView")
         self.gridLayout.addWidget(self.webView, 0, 0, 1, 3)
         self.gridLayout.setGeometry(QtCore.QRect(0, 0, 1920, 1080))
         self.gridLayout.setRowStretch(0, 1)
         
-
         # Add auto-scroll text label
         self.font = QtGui.QFont()
         self.font.setFamily("Serif")

@@ -13,7 +13,7 @@ class SplashWindow(QWidget):
         self.logo_label = QLabel(self)
         self.logo_label.setAlignment(Qt.AlignCenter)
         pixmap = QPixmap("assets/logo.jpg")
-        scaled_pixmap = pixmap.scaled(1920, 1080, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        scaled_pixmap = pixmap.scaled(1900, 1060, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.logo_label.setPixmap(scaled_pixmap)
         layout.addWidget(self.logo_label)
 
@@ -37,7 +37,6 @@ class SplashWindow(QWidget):
         fade_out.finished.connect(self.close)
         fade_out.start()
         self.next_window.showFullScreen()
-        QTimer.singleShot(10000, splash.start_main_app)
         QTimer.singleShot(2000, self.close_splash)
 
     def close_splash(self):
