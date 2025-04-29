@@ -14,12 +14,13 @@ class ProcessWindow(QWidget):
         self.setGeometry(100, 100, 1000, 600)
         
         self.pause_clicked = False
-        self.pause_time = 3 * 60 # 3 daqiqa
+        self.last_task_index = 0
+        self.pause_time = 3 * 3 # 3 daqiqa
         self.work_time_in_second = 0
         self.active_pin = 0
         self.discounting = 0
         self.current_time = QTime.currentTime().toString("hh:mm")
-        
+        self.selected_option = False
         self.relays = []
         with open('config.a', '+r') as config_file:
             config_data = config_file.readlines()
@@ -106,6 +107,7 @@ class ProcessWindow(QWidget):
         self.lbl_value.setGeometry(0, size.height() // 2, size.width(), size.height() // 2)
             
     def pause_callback(self, index):
+        self.selected_option = False
         print(f"Pause Callback: {index}")
         if self.work_time_in_second > 0:
             self.pause_clicked = True
@@ -121,33 +123,37 @@ class ProcessWindow(QWidget):
             second = int(self.pause_time % 60)
             if self.pause_time > 0:
                 self.pause_time -= 1
+            else:
+                self.pause_time = 0
+                self.execute_task(self.last_task_index)
         else:
             minute = int(self.work_time_in_second / 60)
             second = int(self.work_time_in_second % 60)
-            if self.work_time_in_second > 0:
+            if self.selected_option == True:
                 self.work_time_in_second -= 1
-                if self.active_pin > 0:
-                    GPIO.output(self.active_pin, GPIO.LOW)
-                    if self.summa > 0:
-                        self.summa -= self.discounting
-                        if self.summa < 0:
-                            self.summa = 0
-                        self.lbl_value.setText(str(self.summa) + " so'm")
-                        with open('last.a', 'w') as last_file:
-                            last_file.write(str(self.summa))
-            else:
-                self.summa = 0
-                self.work_time_in_second = 0
-                self.lbl_func.setText("----")
-                if self.summa <= 0:
+                if self.work_time_in_second <= 0:
+                    self.work_time_in_second = 0
+                self.summa -= self.discounting
+                if self.summa < 0:
+                    self.selected_option = False
+                    self.summa = 0
+                if self.summa > 0:
+                    self.lbl_value.setText(str(self.summa) + " so'm")
+                else:
+                    self.pause_time = 3 * 3
                     self.lbl_value.setText("----")
-                
-                    
+                with open('last.a', 'w') as last_file:
+                    last_file.write(str(self.summa))
+            else:
+                if self.summa > 0:
+                    self.lbl_value.setText(str(self.summa) + " so'm")
+                else:
+                    self.lbl_value.setText("----")
+
         if minute > 0 or second > 0:
             self.current_time = str(f"{minute:02}:{second:02}")
         else:
             self.current_time = QTime.currentTime().toString("hh:mm")
-            self.lbl_func.setText("----")
         if self.toggle_clock:
             self.current_time  = self.current_time.replace(":", " ")
         self.toggle_clock = not self.toggle_clock
@@ -155,11 +161,11 @@ class ProcessWindow(QWidget):
         
     def handle_interrupt(self, channel):
         self.summa += 1000
-        self.
         self.lbl_value.setText(f"{self.summa} so'm")
 
     def execute_task(self, task_index):
         self.pause_clicked = False
+        self.last_task_index = task_index
         if self.summa > 0:
             for pin in self.output_pins:
                 GPIO.output(pin, GPIO.LOW)
@@ -167,6 +173,7 @@ class ProcessWindow(QWidget):
             input_index = self.input_pins.index(task_index)
             self.active_pin = self.output_pins[input_index]
             GPIO.output(self.active_pin, GPIO.HIGH)
+            self.selected_option = True
             price = self.relays[input_index]["price"]
             funk_name = self.relays[input_index]["desc"]
             self.lbl_func.setText(funk_name)
