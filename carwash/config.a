@@ -1,1 +1,100 @@
-[{"name": "Relay 1", "desc": "Relay 1", "port": 27, "on_time": 800, "off_time": 200, "price": 2000.0}, {"name": "Relay 2", "desc": "Relay 1", "port": 22, "on_time": 800, "off_time": 200, "price": 2000.0}, {"name": "Relay 3", "desc": "Relay 1", "port": 10, "on_time": 800, "off_time": 200, "price": 2000.0}, {"name": "Relay 4", "desc": "Relay 1", "port": 9, "on_time": 800, "off_time": 200, "price": 2000.0}, {"name": "Relay 5", "desc": "Relay 1", "port": 11, "on_time": 800, "off_time": 200, "price": 2000.0}, {"name": "Relay 6", "desc": "Relay 1", "port": 5, "on_time": 800, "off_time": 200, "price": 2000.0}, {"name": "Relay 7", "desc": "Relay 1", "port": 6, "on_time": 800, "off_time": 200, "price": 2000.0}, {"name": "Relay 8", "desc": "Relay 1", "port": 13, "on_time": 800, "off_time": 200, "price": 2000.0}, {"name": "Relay 9", "desc": "Relay 1", "port": 19, "on_time": 800, "off_time": 200, "price": 2000.0}, {"name": "Relay 10", "desc": "Relay 1", "port": 26, "on_time": 800, "off_time": 200, "price": 2000.0}]
+{
+    "options": [
+        {
+            "id": 1,
+            "name": "WATER",
+            "relay_pin": 27,
+            "button_pin": 2,
+            "on_time": 900,
+            "off_time": 200,
+            "price": 3000
+        },
+        {
+            "id": 2,
+            "name": "PENA",
+            "relay_pin": 22,
+            "button_pin": 3,
+            "on_time": 900,
+            "off_time": 200,
+            "price": 5000
+        },
+        {
+            "id": 3,
+            "name": "SHAMPOO",
+            "relay_pin": 10,
+            "button_pin": 18,
+            "on_time": 900,
+            "off_time": 200,
+            "price": 5000
+        },
+        {
+            "id": 4,
+            "name": "NUMBER4",
+            "relay_pin": 9,
+            "button_pin": 23,
+            "on_time": 900,
+            "off_time": 200,
+            "price": 5000
+        },
+        {
+            "id": 5,
+            "name": "NUMBER5",
+            "relay_pin": 11,
+            "button_pin": 24,
+            "on_time": 900,
+            "off_time": 200,
+            "price": 12000
+        },
+        {
+            "id": 6,
+            "name": "NUMBER8",
+            "relay_pin": 5,
+            "button_pin": 25,
+            "on_time": 900,
+            "off_time": 200,
+            "price": 7000
+        },
+        {
+            "id": 7,
+            "name": "NUMBER6",
+            "relay_pin": 6,
+            "button_pin": 8,
+            "on_time": 900,
+            "off_time": 200,
+            "price": 7000
+        },
+        {
+            "id": 8,
+            "name": "OPTION-8",
+            "relay_pin": 13,
+            "button_pin": 7,
+            "on_time": 900,
+            "off_time": 200,
+            "price": 2000
+        },
+        {
+            "id": 9,
+            "name": "OPTION-9",
+            "relay_pin": 19,
+            "button_pin": 12,
+            "on_time": 900,
+            "off_time": 200,
+            "price": 2000
+        },
+        {
+            "id": 10,
+            "name": "OPTION-10",
+            "relay_pin": 26,
+            "button_pin": 16,
+            "on_time": 900,
+            "off_time": 200,
+            "price": 2000
+        }
+    ],
+    "pause_time": 180,
+    "penalty_cost": 2000,
+    "device_id": "12837192388a0sdua9hdsausdhas",
+    "username": "deviceuser",
+    "password": "supersecret123",
+    "url": "https://masofaviy-monitoring.uz/api/CarWashDevice/Resources/"
+}

@@ -4,8 +4,9 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
 from PyQt5.QtGui import QFontDatabase, QFont
 from PyQt5.QtCore import Qt, QTimer, QTime
 import time
-import json
-import os
+from utils import Config
+import threading
+import asyncio
 
 class ProcessWindow(QWidget):
     def __init__(self):
@@ -13,33 +14,45 @@ class ProcessWindow(QWidget):
         self.setWindowTitle("Process")
         self.setGeometry(100, 100, 1000, 600)
         
+        self.input_pins = []
+        self.output_pins = []
+        self.process_data = []
+        self.last_summa = 0
+        self.last_option = 'NONE'
+        self.cash_sum = 0
+        self.cash_sum_discount = 0
+        self.pause_time = 0
+        self.option_time :float = 0.0
+        self.current_option = None
+        self.timer_counter = 0
+        self.toggle_clock = False
+        self.in_option = False
         self.pause_clicked = False
-        self.last_task_index = 0
-        self.pause_time = 3 * 3 # 3 daqiqa
-        self.work_time_in_second = 0
-        self.active_pin = 0
-        self.discounting = 0
-        self.current_time = QTime.currentTime().toString("hh:mm")
-        self.selected_option = False
-        self.relays = []
-        with open('config.a', '+r') as config_file:
-            config_data = config_file.readlines()
-            self.relays.clear()
-            self.relays = json.loads(config_data[0])
+        self.optoin_price = 0
+        self.cash_data_post = False
+        self.cash_data_sended = False
+        self.penalty_time_cost = 2000
         
+        # Config faylidan ma'lumotlarni yuklash
+        self.config = Config()
+        self.config.load_config()
+        self.process_data = self.config.config_data["options"]
+        self.output_pins = self.config.relay_pins
+        self.input_pins = self.config.button_pins
+        self.cash_pin = self.config.cash_pin
+        self.pause_pin = self.config.pause_pin
+        self.out_pwr_en = self.config.out_pwr_en
+        self.pause_time = float(self.config.pause_time)
+        self.last_summa = self.config.get_last_event()['summa']
+        self.last_option = self.config.get_last_event()['option']
+        self.penalty_time_cost = self.config.penalty_cost
+        
+        if self.last_summa > 0:
+            self.cash_sum = self.last_summa
+            self.pause_clicked = True
         # GPIO sozlamalari
         GPIO.setmode(GPIO.BCM)
-        self.output_pins = [relay["port"] for relay in self.relays]
-        self.input_pins = [2, 3, 18, 23, 24, 25, 8, 7, 12, 16]
-        self.cash_interrupt_pin = 21  # Interrupt uchun kiruvchi pin
-        self.summa = 0  # Umumiy summa
-        if os.path.exists('last.a'):
-            with open('last.a', 'r') as last:
-                self.summa = int(last.read())
-            
-        self.out_pwr_en = 17
-        self.pause_interrupt_pin = 20
-        
+                
         GPIO.setup(self.out_pwr_en, GPIO.OUT)
         GPIO.output(self.out_pwr_en, GPIO.HIGH)
         
@@ -51,37 +64,42 @@ class ProcessWindow(QWidget):
         # Kiruvchi pinlarni sozlash
         for pin in self.input_pins:
             GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pin, GPIO.RISING, callback=self.execute_task, bouncetime=200)
+            GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.execute_option, bouncetime=1000)
 
         # Interrupt pinni sozlash
-        GPIO.setup(self.pause_interrupt_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.add_event_detect(self.pause_interrupt_pin, GPIO.FALLING, callback=self.pause_callback, bouncetime=200)
-        GPIO.setup(self.cash_interrupt_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.add_event_detect(self.cash_interrupt_pin, GPIO.FALLING, callback=self.handle_interrupt, bouncetime=50)
-
-        font = QFont("FreeSerif")
-        font.setPixelSize(400)
+        GPIO.setup(self.pause_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.add_event_detect(self.pause_pin, GPIO.FALLING, callback=self.pause_callback, bouncetime=1000)
+        
+        GPIO.setup(self.cash_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.add_event_detect(self.cash_pin, GPIO.RISING, callback=self.cash_callback, bouncetime=50)
+        
+        # fontlarni yuklash
+        self.font = QFont("FreeSerif")
+        self.font.setPixelSize(500)
 
         # Label yaratish
         self.lbl_timer = QLabel(self)
-        self.lbl_timer.setFont(font)
+        self.lbl_timer.setFont(self.font)
         self.lbl_timer.setStyleSheet("color: red; background-color: black;")
         self.lbl_timer.setAlignment(Qt.AlignCenter)
+        self.lbl_timer_str = "--:--"
+        self.lbl_timer.setText(self.lbl_timer_str)
 
-        font.setPixelSize(200)
+        self.font.setPixelSize(200)
         self.lbl_value = QLabel(self)
-        self.lbl_value.setFont(font)
+        self.lbl_value.setFont(self.font)
         self.lbl_value.setStyleSheet("color: red; background-color: black;")
         self.lbl_value.setAlignment(Qt.AlignCenter)
-        self.lbl_value.setText("----")
+        self.lbl_value_str = "0 so'm"
+        self.lbl_value.setText(self.lbl_value_str)
         
-        font.setPixelSize(200)
         self.lbl_func = QLabel(self)
-        self.lbl_func.setFont(font)
+        self.lbl_func.setFont(self.font)
         self.lbl_func.setStyleSheet("color: red; background-color: black;")
         self.lbl_func.setAlignment(Qt.AlignCenter)
-        self.lbl_func.setText("----")
-
+        self.lbl_func_str = "PUL KIRITING!"
+        self.lbl_func.setText(self.lbl_func_str)
+        
         # Layout yaratish
         layout_hor = QVBoxLayout()
         layout_hor.addWidget(self.lbl_func)
@@ -92,106 +110,136 @@ class ProcessWindow(QWidget):
         layout.addLayout(layout_hor)
         self.setLayout(layout)
 
-        self.callback_function = None
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_time)
-        self.timer.start(1000)
-        self.toggle_clock = False
-        self.ads_window_time = time.process_time()
-        self.ads_window_show = False
-        self.update_time()
+        self.timer_intervent = 100
+        self.timer.start(self.timer_intervent)
+        
+        self.httptimer = QTimer(self)
+        self.httptimer.timeout.connect(self.fetch_config_data)
+        self.httptimer.start(5000) # 24 soat
+        
+    def fetch_config_data(self):
+        if self.in_option or self.pause_clicked:
+            return
+        asyncio.run(self.config.update_config())
+        self.process_data = self.config.config_data["options"]
         
     def setWindowSize(self, size):
         self.setGeometry(0, 0, size.width(), size.height())
         self.lbl_timer.setGeometry(0, 0, size.width(), size.height() // 2)
         self.lbl_value.setGeometry(0, size.height() // 2, size.width(), size.height() // 2)
             
-    def pause_callback(self, index):
-        self.selected_option = False
-        print(f"Pause Callback: {index}")
-        if self.work_time_in_second > 0:
-            self.pause_clicked = True
-            self.lbl_func.setText("PAUSE")
-            for pin in self.output_pins:
-                GPIO.output(pin, GPIO.LOW)
-            
+    
+    def seconds_to_str(self, seconds, format_str="%H:%M:%S"):
+        hours, remainder = divmod(int(seconds), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        time_str = format_str.replace("%H", f"{hours:02}")
+        time_str = time_str.replace("%M", f"{minutes:02}")
+        time_str = time_str.replace("%S", f"{seconds:02}")
+        return time_str
+    
     def update_time(self):
-        minute = int(self.work_time_in_second / 60)
-        second = int(self.work_time_in_second % 60)
-        if self.pause_clicked ==True:
-            minute = int(self.pause_time / 60)
-            second = int(self.pause_time % 60)
-            if self.pause_time > 0:
-                self.pause_time -= 1
+        lbl_value_text = ""
+        lbl_func_text = ""
+        lbl_timer_text = ""
+        if self.in_option == False:
+            self.timer_counter += 1
+            if self.timer_counter >= 5:
+                self.timer_counter = 0
+                self.toggle_clock = not self.toggle_clock
+            if self.pause_clicked:
+                lbl_func_text = "PAUSE"
+                self.current_option = "None"
+                self.pause_time -= 0.1
+                lbl_timer_text = self.seconds_to_str(int(self.pause_time), "%M:%S") if self.toggle_clock else self.seconds_to_str(int(self.pause_time), "%M %S")
+                if self.pause_time <= 0:
+                    self.pause_clicked = False
+                    if self.cash_sum > 0:
+                        self.in_option = True
+                        self.option_time = self.cash_sum * 60 / self.penalty_time_cost
+                        self.cash_sum_discount = self.cash_sum / self.penalty_time_cost / 10
+                        self.cash_data_post = False
             else:
-                self.pause_time = 0
-                self.execute_task(self.last_task_index)
+                self.pause_time = self.config.pause_time
+                lbl_func_text = "PUL KIRITING!"
+                lbl_timer_text = QTime.currentTime().toString("hh:mm") if self.toggle_clock else QTime.currentTime().toString("hh mm")
         else:
-            minute = int(self.work_time_in_second / 60)
-            second = int(self.work_time_in_second % 60)
-            if self.selected_option == True:
-                self.work_time_in_second -= 1
-                if self.work_time_in_second <= 0:
-                    self.work_time_in_second = 0
-                self.summa -= self.discounting
-                if self.summa < 0:
-                    self.selected_option = False
-                    self.summa = 0
-                if self.summa > 0:
-                    self.lbl_value.setText(str(self.summa) + " so'm")
-                else:
-                    self.pause_time = 3 * 3
-                    self.lbl_value.setText("----")
-                with open('last.a', 'w') as last_file:
-                    last_file.write(str(self.summa))
+            self.option_time -= 0.1
+            self.cash_sum -= self.cash_sum_discount
+            if self.option_time <= 0:
+                self.in_option = False
+                self.pause_clicked = True
+                self.option_time = 0.0
+                self.cash_sum = 0
+                self.cash_data_post = False
+                lbl_func_text = "PUL KIRITING!"
             else:
-                if self.summa > 0:
-                    self.lbl_value.setText(str(self.summa) + " so'm")
-                else:
-                    self.lbl_value.setText("----")
-
-        if minute > 0 or second > 0:
-            self.current_time = str(f"{minute:02}:{second:02}")
-        else:
-            self.current_time = QTime.currentTime().toString("hh:mm")
-        if self.toggle_clock:
-            self.current_time  = self.current_time.replace(":", " ")
-        self.toggle_clock = not self.toggle_clock
-        self.lbl_timer.setText(self.current_time)
+                lbl_func_text = f"{self.current_option['name']}"
+                lbl_timer_text = self.seconds_to_str(int(self.option_time), "%M:%S") if self.toggle_clock else self.seconds_to_str(int(self.option_time), "%M %S")
+        lbl_value_text = f"{int(self.cash_sum)} so'm"
+        if lbl_timer_text != "":
+            self.lbl_timer.setText(lbl_timer_text)
+        if lbl_func_text != "":
+            self.lbl_func.setText(lbl_func_text)
+        if lbl_value_text != "":
+            self.lbl_value.setText(lbl_value_text)
+            
+    def pause_callback(self, pin):
+        if self.pause_time > 0:
+            self.pause_clicked = True
         
-    def handle_interrupt(self, channel):
-        self.summa += 1000
-        self.lbl_value.setText(f"{self.summa} so'm")
+    def cash_callback(self, pin):
+        self.cash_data_post = True
+        self.cash_sum += 1000
+        self.lbl_value.setText(f"{self.cash_sum} so'm")
 
-    def execute_task(self, task_index):
+    def execute_option(self, pin):
+        option = None
+        for data in self.process_data:
+            if data['button_pin'] == pin:
+                option = data
+        if option is None:
+            return
+        if self.cash_sum > 0:
+            self.pause_clicked = True
+            if self.cash_data_sended == False and self.cash_data_post == True:
+                self.cash_data_sended = True
+                asyncio.run(self.config.cash_data_post(self.config.url_cash, self.config.username, self.config.password, self.config.device_id, self.cash_sum))
+            time.sleep(2)
+            execute_thread = threading.Thread(target=self.execute, args=(option,))
+            execute_thread.start()
+
+    def execute(self, option):
         self.pause_clicked = False
-        self.last_task_index = task_index
-        if self.summa > 0:
-            for pin in self.output_pins:
-                GPIO.output(pin, GPIO.LOW)
-            print(f"Tugma {task_index} bosildi. Vazifa bajarilmoqda...")
-            input_index = self.input_pins.index(task_index)
-            self.active_pin = self.output_pins[input_index]
-            GPIO.output(self.active_pin, GPIO.HIGH)
-            self.selected_option = True
-            price = self.relays[input_index]["price"]
-            funk_name = self.relays[input_index]["desc"]
-            self.lbl_func.setText(funk_name)
-            self.work_time_in_second = self.summa * 60 / price
-            self.discounting = int(price / 60)
-        else:
-            self.active_pin = 0
-            self.lbl_value.setText("Pul yetarli emas")
-            QTimer.singleShot(2000, lambda: self.lbl_value.setText("----"))
+        self.current_option = option
+        self.option_time = self.cash_sum * 60 / option['price']
+        self.cash_sum_discount = self.cash_sum / self.option_time / 10
+        self.last_summa = self.cash_sum
+        self.last_option = option['name']
+        self.in_option = True
+        while True:
+            thread_relay = threading.Thread(target=self.control_relay, args=(option['relay_pin'], option['on_time'], option['off_time']))
+            thread_relay.start()
+            time.sleep((option['on_time'] + option['off_time']) / 1000)
+            if self.pause_clicked:
+                break
+            if self.cash_sum <= 0:
+                break
+        self.in_option = False
         
-        
+    def control_relay(self, relay_pin, on_time, off_time):
+        GPIO.output(relay_pin, GPIO.HIGH)
+        time.sleep(on_time / 1000)
+        GPIO.output(relay_pin, GPIO.LOW)
+        time.sleep(off_time / 1000)
+    
     def closeEvent(self, event):
-        for pin in self.output_pins:
-            GPIO.output(pin, GPIO.LOW)
         GPIO.cleanup()
         event.accept()
 
 if __name__ == "__main__":
+    
     app = QApplication(sys.argv)
     window = ProcessWindow()
     window.showFullScreen()
