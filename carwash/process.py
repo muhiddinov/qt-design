@@ -150,7 +150,6 @@ class ProcessWindow(QWidget):
                 self.toggle_clock = not self.toggle_clock
             if self.pause_clicked:
                 lbl_func_text = "PAUSE"
-                self.current_option = "None"
                 self.pause_time -= 0.1
                 lbl_timer_text = self.seconds_to_str(int(self.pause_time), "%M:%S") if self.toggle_clock else self.seconds_to_str(int(self.pause_time), "%M %S")
                 if self.pause_time <= 0:
@@ -184,10 +183,21 @@ class ProcessWindow(QWidget):
             self.lbl_func.setText(lbl_func_text)
         if lbl_value_text != "":
             self.lbl_value.setText(lbl_value_text)
-            
+        self.config.save_last_event({"summa": int(self.cash_sum), "option": lbl_func_text})
+    
     def pause_callback(self, pin):
-        if self.pause_time > 0:
+        if self.pause_time > 0 and self.cash_sum > 0:
             self.pause_clicked = True
+        press_and_hold = False
+        start_time = time.time()
+        while GPIO.input(pin) == GPIO.LOW:
+            if time.time() - start_time >= 10:
+                press_and_hold = True
+                break
+        if press_and_hold:
+            self.in_option = False
+            self.cash_sum = 0
+            self.pause_clicked = False
         
     def cash_callback(self, pin):
         self.cash_data_post = True
