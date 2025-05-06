@@ -2,7 +2,7 @@
     "options": [
         {
             "id": 1,
-            "name": "WATER",
+            "name": "NUMBER1",
             "relay_pin": 27,
             "button_pin": 2,
             "on_time": 900,
@@ -11,7 +11,7 @@
         },
         {
             "id": 2,
-            "name": "PENA",
+            "name": "NUMBER3",
             "relay_pin": 22,
             "button_pin": 3,
             "on_time": 900,
@@ -20,7 +20,7 @@
         },
         {
             "id": 3,
-            "name": "SHAMPOO",
+            "name": "NUMBER2",
             "relay_pin": 10,
             "button_pin": 18,
             "on_time": 900,
@@ -92,7 +92,7 @@
         }
     ],
     "pause_time": 180,
-    "penalty_cost": 2000,
+    "penalty_cost": 500,
     "device_id": "qOMVzYh0JfXlfHkIWxq6VOO8dqIZ05Zy4fL6fqmPrY3dUHXAKK3mCckl5wyFJIAI",
     "username": "deviceuser",
     "password": "supersecret123",

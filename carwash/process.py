@@ -143,11 +143,11 @@ class ProcessWindow(QWidget):
         lbl_value_text = ""
         lbl_func_text = ""
         lbl_timer_text = ""
+        self.timer_counter += 1
+        if self.timer_counter >= 5:
+            self.timer_counter = 0
+            self.toggle_clock = not self.toggle_clock
         if self.in_option == False:
-            self.timer_counter += 1
-            if self.timer_counter >= 5:
-                self.timer_counter = 0
-                self.toggle_clock = not self.toggle_clock
             if self.pause_clicked:
                 lbl_func_text = "PAUSE"
                 self.pause_time -= 0.1
@@ -161,7 +161,7 @@ class ProcessWindow(QWidget):
                         self.cash_data_post = False
             else:
                 self.pause_time = self.config.pause_time
-                lbl_func_text = "PUL KIRITING!"
+                lbl_func_text = "PUL KIRITING!" if self.cash_sum <= 0 else "PUL KIRITILDI!"
                 lbl_timer_text = QTime.currentTime().toString("hh:mm") if self.toggle_clock else QTime.currentTime().toString("hh mm")
         else:
             self.option_time -= 0.1
@@ -202,6 +202,8 @@ class ProcessWindow(QWidget):
     def cash_callback(self, pin):
         self.cash_data_post = True
         self.cash_sum += 1000
+        
+        self.option_time = int(self.cash_sum * 60 / self.current_option['price'])
         self.lbl_value.setText(f"{self.cash_sum} so'm")
 
     def execute_option(self, pin):

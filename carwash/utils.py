@@ -86,26 +86,39 @@ class Config:
                         config_data = await response.json()
                         myconfig = self.load_config(config_file)
                         options = myconfig['options']
-                        for item in config_data:
-                            name = item['resourceName']
-                            price = item['resourceMinutePrice']
-                            relayPort = int(item['relayPort'])
-                            relayOnTime = item['relayOnTime']
-                            relayOffTime = item['relayOfTime']
-                            for option in options:
-                                if option['relay_pin'] == relayPort:
-                                    option['name'] = name
-                                    option['price'] = price
-                                    option['relay_pin'] = relayPort
-                                    option['on_time'] = relayOnTime
-                                    option['off_time'] = relayOffTime
-                                    break
+                        option_config = config_data['options']
+                        if option_config:
+                            for item in option_config:
+                                name = item['resourceName']
+                                price = item['resourceMinutePrice']
+                                relayPort = int(item['relayPort'])
+                                relayOnTime = item['relayOnTime']
+                                relayOffTime = item['relayOfTime']
+                                for option in options:
+                                    if option['relay_pin'] == relayPort:
+                                        option['name'] = name
+                                        option['price'] = price
+                                        option['relay_pin'] = relayPort
+                                        option['on_time'] = relayOnTime
+                                        option['off_time'] = relayOffTime
+                                        break
+                        if config_data['pause_time'] is not None:
+                            self.pause_time = config_data['pause_time']
+                            if self.pause_time == 0:
+                                self.pause_time = 180
+                        if config_data['penalty_cost'] is not None:
+                            self.penalty_cost = config_data['penalty_cost']
+                            if self.penalty_cost == 0:
+                                self.penalty_cost = 2000
                         myconfig['options'] = options
                         self.save_config(json_data=myconfig)
+                        return myconfig
                     else:
                         print(f"Failed to fetch config data. Status code: {response.status}")
+                        return None
         except aiohttp.ClientError as e:
             print(f"Error fetching config data: {e}")
+            return None
         
 if __name__ == "__main__":
     config = Config()
