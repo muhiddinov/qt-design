@@ -17,9 +17,11 @@ class Config:
         self.username = 'deviceuser'
         self.password = 'supersecret123'
         self.url_cash = "https://masofaviy-monitoring.uz/api/CarWashDevice/PaymentUpload"
-        self.url = 'https://masofaviy-monitoring.uz/api/CarWashDevice/Resources/'
+        self.url_config = 'https://masofaviy-monitoring.uz/api/CarWashDevice/Resources/'
         self.device_id = '12837192388a0sdua9hdsausdhas'
         self.penalty_cost = 2000
+        self.currency = "so'm"
+        self.currency_rate = 1000
         
     def load_config(self, config_file :str = 'config.a') -> list:
         json_data = []
@@ -29,6 +31,10 @@ class Config:
             self.pause_time = json_data['pause_time']
             self.penalty_cost = json_data['penalty_cost']
             json_options = json_data['options']
+            self.url_config = json_data['url_config']
+            self.url_cash = json_data['url_cash']
+            self.currency = json_data['currency']
+            self.currency_rate = json_data['currency_rate']
             for data in json_options:
                 self.relay_pins.append(data['relay_pin'])
                 self.button_pins.append(data['button_pin'])
@@ -86,7 +92,7 @@ class Config:
                         config_data = await response.json()
                         myconfig = self.load_config(config_file)
                         options = myconfig['options']
-                        option_config = config_data['options']
+                        option_config = config_data['resources']
                         if option_config:
                             for item in option_config:
                                 name = item['resourceName']
@@ -106,10 +112,12 @@ class Config:
                             self.pause_time = config_data['pause_time']
                             if self.pause_time == 0:
                                 self.pause_time = 180
+                            self.pause_time = 60 if self.pause_time < 60 else self.pause_time                                
                         if config_data['penalty_cost'] is not None:
                             self.penalty_cost = config_data['penalty_cost']
                             if self.penalty_cost == 0:
                                 self.penalty_cost = 2000
+                            self.penalty_cost = 500 if self.penalty_cost < 500 else self.penalty_cost
                         myconfig['options'] = options
                         self.save_config(json_data=myconfig)
                         return myconfig

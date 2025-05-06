@@ -93,8 +93,10 @@
     ],
     "pause_time": 180,
     "penalty_cost": 500,
+    "currency": "so'm",
+    "currency_rate": 1000,
     "device_id": "qOMVzYh0JfXlfHkIWxq6VOO8dqIZ05Zy4fL6fqmPrY3dUHXAKK3mCckl5wyFJIAI",
     "username": "deviceuser",
     "password": "supersecret123",
-    "url": "https://masofaviy-monitoring.uz/api/CarWashDevice/Resources/"
+    "url_config": "https://masofaviy-monitoring.uz/api/CarWashDevice/Resources/"
 }

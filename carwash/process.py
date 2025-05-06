@@ -32,6 +32,7 @@ class ProcessWindow(QWidget):
         self.cash_data_post = False
         self.cash_data_sended = False
         self.penalty_time_cost = 2000
+        self.vip_client = False
         
         # Config faylidan ma'lumotlarni yuklash
         self.config = Config()
@@ -164,8 +165,11 @@ class ProcessWindow(QWidget):
                 lbl_func_text = "PUL KIRITING!" if self.cash_sum <= 0 else "PUL KIRITILDI!"
                 lbl_timer_text = QTime.currentTime().toString("hh:mm") if self.toggle_clock else QTime.currentTime().toString("hh mm")
         else:
-            self.option_time -= 0.1
-            self.cash_sum -= self.cash_sum_discount
+            if self.vip_client == False:
+                self.option_time -= 0.1
+                self.cash_sum -= self.cash_sum_discount
+            else:
+                self.option_time += 0.1
             if self.option_time <= 0:
                 self.in_option = False
                 self.pause_clicked = True
@@ -176,7 +180,7 @@ class ProcessWindow(QWidget):
             else:
                 lbl_func_text = f"{self.current_option['name']}"
                 lbl_timer_text = self.seconds_to_str(int(self.option_time), "%M:%S") if self.toggle_clock else self.seconds_to_str(int(self.option_time), "%M %S")
-        lbl_value_text = f"{int(self.cash_sum)} so'm"
+        lbl_value_text = f"{int(self.cash_sum)} {self.config.currency}" if self.vip_client == False else "PREMIUM"
         if lbl_timer_text != "":
             self.lbl_timer.setText(lbl_timer_text)
         if lbl_func_text != "":
@@ -201,10 +205,9 @@ class ProcessWindow(QWidget):
         
     def cash_callback(self, pin):
         self.cash_data_post = True
-        self.cash_sum += 1000
-        
+        self.cash_sum += self.config.currency_rate
         self.option_time = int(self.cash_sum * 60 / self.current_option['price'])
-        self.lbl_value.setText(f"{self.cash_sum} so'm")
+        self.lbl_value.setText(f"{int(self.cash_sum)} {self.config.currency}")
 
     def execute_option(self, pin):
         option = None
@@ -213,14 +216,19 @@ class ProcessWindow(QWidget):
                 option = data
         if option is None:
             return
-        if self.cash_sum > 0:
+        if option['name'] == 'VIP':
+            self.vip_client = not self.vip_client
+        if self.vip_client:
             self.pause_clicked = True
-            if self.cash_data_sended == False and self.cash_data_post == True:
-                self.cash_data_sended = True
-                asyncio.run(self.config.cash_data_post(self.config.url_cash, self.config.username, self.config.password, self.config.device_id, self.cash_sum))
-            time.sleep(2)
-            execute_thread = threading.Thread(target=self.execute, args=(option,))
-            execute_thread.start()
+        else:
+            if self.cash_sum > 0:
+                self.pause_clicked = True
+                if self.cash_data_sended == False and self.cash_data_post == True:
+                    self.cash_data_sended = True
+                    asyncio.run(self.config.cash_data_post(self.config.url_cash, self.config.username, self.config.password, self.config.device_id, self.cash_sum))
+                time.sleep(2)
+                execute_thread = threading.Thread(target=self.execute, args=(option,))
+                execute_thread.start()
 
     def execute(self, option):
         self.pause_clicked = False
