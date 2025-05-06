@@ -83,7 +83,7 @@
         },
         {
             "id": 10,
-            "name": "OPTION-10",
+            "name": "VIP",
             "relay_pin": 26,
             "button_pin": 16,
             "on_time": 900,
@@ -98,5 +98,6 @@
     "device_id": "qOMVzYh0JfXlfHkIWxq6VOO8dqIZ05Zy4fL6fqmPrY3dUHXAKK3mCckl5wyFJIAI",
     "username": "deviceuser",
     "password": "supersecret123",
-    "url_config": "https://masofaviy-monitoring.uz/api/CarWashDevice/Resources/"
+    "url_config": "https://masofaviy-monitoring.uz/api/CarWashDevice/Resources/",
+    "url_cash": "https://masofaviy-monitoring.uz/api/CarWashDevice/PaymentUpload"
 }

@@ -116,9 +116,9 @@ class ProcessWindow(QWidget):
         self.timer_intervent = 100
         self.timer.start(self.timer_intervent)
         
-        self.httptimer = QTimer(self)
-        self.httptimer.timeout.connect(self.fetch_config_data)
-        self.httptimer.start(5000) # 24 soat
+        # self.httptimer = QTimer(self)
+        # self.httptimer.timeout.connect(self.fetch_config_data)
+        # self.httptimer.start(5000) # 24 soat
         
     def fetch_config_data(self):
         if self.in_option or self.pause_clicked:
@@ -150,6 +150,9 @@ class ProcessWindow(QWidget):
             self.toggle_clock = not self.toggle_clock
         if self.in_option == False:
             if self.pause_clicked:
+                if self.cash_sum <= 0:
+                    self.pause_clicked = False
+                    return
                 lbl_func_text = "PAUSE"
                 self.pause_time -= 0.1
                 lbl_timer_text = self.seconds_to_str(int(self.pause_time), "%M:%S") if self.toggle_clock else self.seconds_to_str(int(self.pause_time), "%M %S")
@@ -162,7 +165,10 @@ class ProcessWindow(QWidget):
                         self.cash_data_post = False
             else:
                 self.pause_time = self.config.pause_time
-                lbl_func_text = "PUL KIRITING!" if self.cash_sum <= 0 else "PUL KIRITILDI!"
+                if self.vip_client == False:
+                    lbl_func_text = "PUL KIRITING!" if self.cash_sum <= 0 else "PUL KIRITILDI!"
+                else:
+                    lbl_func_text = "TANLANG!"
                 lbl_timer_text = QTime.currentTime().toString("hh:mm") if self.toggle_clock else QTime.currentTime().toString("hh mm")
         else:
             if self.vip_client == False:
@@ -176,7 +182,7 @@ class ProcessWindow(QWidget):
                 self.option_time = 0.0
                 self.cash_sum = 0
                 self.cash_data_post = False
-                lbl_func_text = "PUL KIRITING!"
+                lbl_func_text = "PUL KIRITING!" if self.vip_client == False else "VIP"
             else:
                 lbl_func_text = f"{self.current_option['name']}"
                 lbl_timer_text = self.seconds_to_str(int(self.option_time), "%M:%S") if self.toggle_clock else self.seconds_to_str(int(self.option_time), "%M %S")
@@ -217,26 +223,32 @@ class ProcessWindow(QWidget):
         if option is None:
             return
         if option['name'] == 'VIP':
-            self.vip_client = not self.vip_client
-        if self.vip_client:
-            self.pause_clicked = True
+            if self.cash_sum == 0 and self.option_time == 0:
+                self.vip_client = not self.vip_client
         else:
-            if self.cash_sum > 0:
+            if self.vip_client:
                 self.pause_clicked = True
-                if self.cash_data_sended == False and self.cash_data_post == True:
-                    self.cash_data_sended = True
-                    asyncio.run(self.config.cash_data_post(self.config.url_cash, self.config.username, self.config.password, self.config.device_id, self.cash_sum))
                 time.sleep(2)
                 execute_thread = threading.Thread(target=self.execute, args=(option,))
                 execute_thread.start()
+            else:
+                if self.cash_sum > 0:
+                    self.pause_clicked = True
+                    if self.cash_data_sended == False and self.cash_data_post == True:
+                        self.cash_data_sended = True
+                        asyncio.run(self.config.cash_data_post(self.config.url_cash, self.config.username, self.config.password, self.config.device_id, self.cash_sum))
+                    time.sleep(2)
+                    execute_thread = threading.Thread(target=self.execute, args=(option,))
+                    execute_thread.start()
 
     def execute(self, option):
         self.pause_clicked = False
         self.current_option = option
-        self.option_time = self.cash_sum * 60 / option['price']
-        self.cash_sum_discount = self.cash_sum / self.option_time / 10
-        self.last_summa = self.cash_sum
-        self.last_option = option['name']
+        if self.vip_client == False:
+            self.option_time = self.cash_sum * 60 / option['price']
+            self.cash_sum_discount = self.cash_sum / self.option_time / 10
+            self.last_summa = self.cash_sum
+            self.last_option = option['name']
         self.in_option = True
         while True:
             thread_relay = threading.Thread(target=self.control_relay, args=(option['relay_pin'], option['on_time'], option['off_time']))
@@ -244,7 +256,7 @@ class ProcessWindow(QWidget):
             time.sleep((option['on_time'] + option['off_time']) / 1000)
             if self.pause_clicked:
                 break
-            if self.cash_sum <= 0:
+            if self.cash_sum <= 0 and self.vip_client == False:
                 break
         self.in_option = False
         
