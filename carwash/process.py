@@ -202,7 +202,7 @@ class ProcessWindow(QWidget):
         press_and_hold = False
         start_time = time.time()
         while GPIO.input(pin) == GPIO.LOW:
-            if time.time() - start_time >= 10:
+            if time.time() - start_time >= 7:
                 press_and_hold = True
                 break
         if press_and_hold:
@@ -245,14 +245,14 @@ class ProcessWindow(QWidget):
 
     def execute(self, option):
         self.pause_clicked = False
+        self.in_option = True
         self.current_option = option
+        option['off_time'] = 0 if option['state'] == False else option['off_time']
         if self.vip_client == False:
             self.option_time = self.cash_sum * 60 / option['price']
             self.cash_sum_discount = self.cash_sum / self.option_time / 10
             self.last_summa = self.cash_sum
             self.last_option = option['name']
-        self.in_option = True
-        option['off_time'] = 0 if option['state'] == False else option['off_time']
         while True:
             thread_relay = threading.Thread(target=self.control_relay, args=(option['relay_pin'], option['on_time'], option['off_time']))
             thread_relay.start()
