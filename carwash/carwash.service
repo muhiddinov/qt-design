@@ -3,8 +3,8 @@ Description=Carwash PyQt5 GUI
 After=network.target graphical.target
 
 [Service]
-ExecStart=/var/www/carwash/main.py
 WorkingDirectory=/var/www/carwash
+ExecStart=/var/www/carwash/main.py
 Restart=on-failure
 RestartSec=5s
 Environment=DISPLAY=:0

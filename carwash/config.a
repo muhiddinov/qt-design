@@ -2,97 +2,107 @@
     "options": [
         {
             "id": 1,
-            "name": "NUMBER1",
+            "name": "NARKOTIK",
             "relay_pin": 27,
             "button_pin": 2,
-            "on_time": 900,
-            "off_time": 200,
-            "price": 3000
+            "on_time": 1000,
+            "off_time": 0,
+            "price": 3000,
+            "state": false
         },
         {
             "id": 2,
-            "name": "NUMBER3",
+            "name": "LACOSTE",
             "relay_pin": 22,
             "button_pin": 3,
-            "on_time": 900,
+            "on_time": 800,
             "off_time": 200,
-            "price": 5000
+            "price": 3000,
+            "state": false
         },
         {
             "id": 3,
-            "name": "NUMBER2",
+            "name": "SHEIKH",
             "relay_pin": 10,
             "button_pin": 18,
-            "on_time": 900,
-            "off_time": 200,
-            "price": 5000
+            "on_time": 800,
+            "off_time": 1,
+            "price": 3000,
+            "state": false
         },
         {
             "id": 4,
-            "name": "NUMBER4",
+            "name": "OPTION-4",
             "relay_pin": 9,
             "button_pin": 23,
-            "on_time": 900,
+            "on_time": 800,
             "off_time": 200,
-            "price": 5000
+            "price": 3000,
+            "state": true
         },
         {
             "id": 5,
-            "name": "NUMBER5",
+            "name": "OPTOIN-5",
             "relay_pin": 11,
             "button_pin": 24,
-            "on_time": 900,
+            "on_time": 800,
             "off_time": 200,
-            "price": 12000
+            "price": 3000,
+            "state": true
         },
         {
             "id": 6,
-            "name": "NUMBER8",
+            "name": "OPTION-6",
             "relay_pin": 5,
             "button_pin": 25,
-            "on_time": 900,
+            "on_time": 800,
             "off_time": 200,
-            "price": 7000
+            "price": 3000,
+            "state": true
         },
         {
             "id": 7,
-            "name": "NUMBER6",
+            "name": "OPTOIN-7",
             "relay_pin": 6,
             "button_pin": 8,
-            "on_time": 900,
+            "on_time": 800,
             "off_time": 200,
-            "price": 7000
+            "price": 3000,
+            "state": true
         },
         {
             "id": 8,
-            "name": "OPTION-8",
+            "name": "OPTOIN-8",
             "relay_pin": 13,
             "button_pin": 7,
-            "on_time": 900,
+            "on_time": 800,
             "off_time": 200,
-            "price": 2000
+            "price": 3000,
+            "state": true
         },
         {
             "id": 9,
             "name": "OPTION-9",
             "relay_pin": 19,
             "button_pin": 12,
-            "on_time": 900,
+            "on_time": 800,
             "off_time": 200,
-            "price": 2000
+            "price": 3000,
+            "state": true
         },
         {
             "id": 10,
             "name": "VIP",
             "relay_pin": 26,
             "button_pin": 16,
-            "on_time": 900,
+            "on_time": 800,
             "off_time": 200,
-            "price": 2000
+            "price": 3000,
+            "state": true
         }
     ],
     "pause_time": 180,
-    "penalty_cost": 500,
+    "penalty_cost": 1500,
     "currency": "so'm",
     "currency_rate": 1000,
     "device_id": "qOMVzYh0JfXlfHkIWxq6VOO8dqIZ05Zy4fL6fqmPrY3dUHXAKK3mCckl5wyFJIAI",
