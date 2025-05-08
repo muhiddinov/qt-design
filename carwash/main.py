@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-from ads import AdvertisingWindow
 from PyQt5.QtWidgets import QApplication, QFrame, QGraphicsScene
 from PyQt5.QtCore import QTimer, Qt
 import sys
@@ -16,12 +15,14 @@ class MainApp:
         self.process = ProcessWindow()
         self.process.setWindowSize(self.screen_size)
         self.process.setWindowTitle("Process Screen")
+        self.process.setCursor(Qt.BlankCursor)
         
         self.splash = SplashWindow()
         self.splash.setGeometry(0, 0, self.screen_size.width(), self.screen_size.height())
         self.splash.setWindowTitle("Splash Screen")
         self.splash.showFullScreen()
         self.splash.setNextWindow(self.process)
+        self.splash.setCursor(Qt.BlankCursor)
         QTimer.singleShot(5000, self.splash.start_main_app)
 
     def run(self):

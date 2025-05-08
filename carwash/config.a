@@ -104,7 +104,7 @@
     "pause_time": 180,
     "penalty_cost": 1500,
     "currency": "so'm",
-    "currency_rate": 1000,
+    "currency_rate": 500,
     "device_id": "URzqYudp2UQ3k3P6RS5WE32ZTCk5MHqoGfw7p74WZfA6dV3OsMXsdT6debmjbKbe",
     "username": "deviceuser",
     "password": "supersecret123",
