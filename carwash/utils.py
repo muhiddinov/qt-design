@@ -57,6 +57,7 @@ class Config:
         try:
             with open('last.a', 'r', encoding='utf-8') as file:
                 json_data = json.load(file)
+                print(json_data)
                 file.close()
         except:
             pass
