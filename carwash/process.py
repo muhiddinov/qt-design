@@ -263,13 +263,14 @@ class ProcessWindow(QWidget):
                 break
             if self.cash_sum <= 0 and self.vip_client == False:
                 break
+        GPIO.output(option['relay_pin'], GPIO.LOW)
         self.in_option = False
         
     def control_relay(self, relay_pin, on_time, off_time):
         GPIO.output(relay_pin, GPIO.HIGH)
         time.sleep(on_time / 1000)
+        GPIO.output(relay_pin, GPIO.LOW)
         if off_time > 1:
-            GPIO.output(relay_pin, GPIO.LOW)
             time.sleep(off_time / 1000)
     
     def closeEvent(self, event):
