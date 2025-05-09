@@ -201,7 +201,7 @@ class ProcessWindow(QWidget):
         if self.last_save_counter >= 10:
             self.last_save_counter = 0
             with open('last.a', 'w', encoding='utf-8') as file:
-                json.dump({"summa": int(self.cash_sum), "option": lbl_func_text}, file)
+                json.dump({"summa": int(self.cash_sum), "option": str(lbl_func_text)}, file)
                 file.close()
     
     def pause_callback(self, pin):
