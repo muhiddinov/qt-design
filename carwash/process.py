@@ -119,6 +119,7 @@ class ProcessWindow(QWidget):
         self.httptimer = QTimer(self)
         self.httptimer.timeout.connect(self.fetch_config_data)
         self.httptimer.start(5000) # 24 soat
+        self.last_save_counter = 0
         
     def fetch_config_data(self):
         if self.in_option or self.pause_clicked or self.vip_client:
@@ -195,7 +196,11 @@ class ProcessWindow(QWidget):
             self.lbl_func.setText(lbl_func_text)
         if lbl_value_text != "":
             self.lbl_value.setText(lbl_value_text)
-        self.config.save_last_event({"summa": int(self.cash_sum), "option": lbl_func_text})
+        self.last_save_counter += 1
+        if self.last_save_counter >= 10:
+            self.last_save_counter = 0
+            res = self.config.save_last_event({"summa": int(lbl_value_text), "option": lbl_func_text})
+            print(res)
     
     def pause_callback(self, pin):
         if self.pause_time > 0 and self.cash_sum > 0:

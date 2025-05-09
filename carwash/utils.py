@@ -63,9 +63,12 @@ class Config:
         return json_data
     
     def save_last_event(self, json_data) -> dict:
-        with open('last.a', 'w', encoding='utf-8') as file:
-            json.dump(json_data, file, ensure_ascii=False, indent=4)
-            file.close()
+        try:
+            with open('last.a', 'w', encoding='utf-8') as file:
+                json.dump(json_data, file)
+                file.close()
+        except:
+            pass
         return json_data
     
     async def cash_data_post(self, url, username, password, device_id, cash_sum: float = 0.0) -> dict:
