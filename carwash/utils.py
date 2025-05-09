@@ -68,7 +68,7 @@ class Config:
                 json.dump(json_data, file)
                 file.close()
         except:
-            pass
+            return {"Message": "Save last event ERROR!"}
         return json_data
     
     async def cash_data_post(self, url, username, password, device_id, cash_sum: float = 0.0) -> dict:
