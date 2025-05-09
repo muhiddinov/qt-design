@@ -7,6 +7,7 @@ import time
 from utils import Config
 import threading
 import asyncio
+import json
 
 class ProcessWindow(QWidget):
     def __init__(self):
@@ -199,8 +200,9 @@ class ProcessWindow(QWidget):
         self.last_save_counter += 1
         if self.last_save_counter >= 10:
             self.last_save_counter = 0
-            res = self.config.save_last_event({"summa": int(self.cash_sum), "option": lbl_func_text})
-            print(res)
+            with open('last.a', 'w', encoding='utf-8') as file:
+                json.dump({"summa": int(self.cash_sum), "option": self.current_option['name']}, file)
+                file.close()
     
     def pause_callback(self, pin):
         if self.pause_time > 0 and self.cash_sum > 0:
