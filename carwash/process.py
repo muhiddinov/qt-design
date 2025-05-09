@@ -230,22 +230,22 @@ class ProcessWindow(QWidget):
                 self.vip_client = not self.vip_client
         else:
             if self.vip_client:
-                # self.pause_clicked = True
-                # time.sleep(0.5)
+                self.pause_clicked = True
+                time.sleep(2)
                 execute_thread = threading.Thread(target=self.execute, args=(option,))
                 execute_thread.start()
             else:
                 if self.cash_sum > 0:
-                    # self.pause_clicked = True
+                    self.pause_clicked = True
                     if self.cash_data_sended == False and self.cash_data_post == True:
                         self.cash_data_sended = True
                         asyncio.run(self.config.cash_data_post(self.config.url_cash, self.config.username, self.config.password, self.config.device_id, self.cash_sum))
-                    # time.sleep(2)
+                    time.sleep(2)
                     execute_thread = threading.Thread(target=self.execute, args=(option,))
                     execute_thread.start()
 
     def execute(self, option):
-        # self.pause_clicked = False
+        self.pause_clicked = False
         self.in_option = True
         self.current_option = option
         option['off_time'] = 0 if option['state'] == False else option['off_time']
