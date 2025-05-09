@@ -54,9 +54,12 @@ class Config:
     
     def get_last_event(self) -> dict:
         json_data = {'summa': 0, 'option': 'NONE'}
-        with open('last.a', 'r', encoding='utf-8') as file:
-            json_data = json.load(file)
-            file.close()
+        try:
+            with open('last.a', 'r', encoding='utf-8') as file:
+                json_data = json.load(file)
+                file.close()
+        except:
+            return json_data
         return json_data
     
     def save_last_event(self, json_data) -> dict:
