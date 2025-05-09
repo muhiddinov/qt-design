@@ -120,10 +120,11 @@ class ProcessWindow(QWidget):
         self.httptimer.timeout.connect(self.fetch_config_data)
         self.httptimer.start(5000) # 24 soat
         
-    def fetch_config_data(self):
-        if self.in_option or self.pause_clicked:
+    async def fetch_config_data(self):
+        if self.in_option or self.pause_clicked or self.vip_client:
             return
-        asyncio.run(self.config.update_config())
+        # asyncio.run(self.config.update_config())
+        await self.config.update_config()
         self.process_data = self.config.config_data["options"]
         
     def setWindowSize(self, size):

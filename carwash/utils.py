@@ -25,26 +25,30 @@ class Config:
         
     def load_config(self, config_file :str = 'config.a') -> list:
         json_data = []
-        with open(str(config_file), 'r', encoding='utf-8') as file:
-            json_data = json.load(file)
-            self.config_data = json_data
-            self.pause_time = json_data['pause_time']
-            self.penalty_cost = json_data['penalty_cost']
-            json_options = json_data['options']
-            self.url_config = json_data['url_config']
-            self.url_cash = json_data['url_cash']
-            self.currency = json_data['currency']
-            self.currency_rate = json_data['currency_rate']
-            self.device_id = json_data['device_id']
-            for data in json_options:
-                self.relay_pins.append(data['relay_pin'])
-                self.button_pins.append(data['button_pin'])
-            file.close()
+        try:
+            with open(str(config_file), 'r', encoding='utf-8') as file:
+                json_data = json.load(file)
+                self.config_data = json_data
+                self.pause_time = json_data['pause_time']
+                self.penalty_cost = json_data['penalty_cost']
+                json_options = json_data['options']
+                self.url_config = json_data['url_config']
+                self.url_cash = json_data['url_cash']
+                self.currency = json_data['currency']
+                self.currency_rate = json_data['currency_rate']
+                self.device_id = json_data['device_id']
+                for data in json_options:
+                    self.relay_pins.append(data['relay_pin'])
+                    self.button_pins.append(data['button_pin'])
+                file.close()
+        except:
+            return None
         return json_data
                 
     def save_config(self, json_data, config_file :str = 'config.a') -> list:
         with open(config_file, 'w', encoding='utf-8') as file:
-            json.dump(json_data, file, ensure_ascii=False, indent=4)
+            if json_data is not None:
+                json.dump(json_data, file, ensure_ascii=False, indent=4)
             file.close()
         return json_data
     
@@ -79,12 +83,10 @@ class Config:
         except aiohttp.ClientError as e:
             print(f"Error posting cash data: {e}")
     
-    async def update_config(self, config_file: str = 'config.a'):
-        resp = await self.fetch_config_data(self.url_config, self.username, self.password, self.device_id, config_file)
-        # print(json.dumps(resp, indent=4))
-        self.load_config(config_file)
+    async def update_config(self):
+        await self.fetch_config_data(self.url_config, self.username, self.password, self.device_id)
         
-    async def fetch_config_data(self, url, username, password, device_id, config_file: str = 'config.a') -> dict:
+    async def fetch_config_data(self, url, username, password, device_id) -> dict:
         url = url + device_id
         auth = aiohttp.BasicAuth(username, password)
         try:
@@ -92,11 +94,10 @@ class Config:
                 async with session.get(url, auth=auth) as response:
                     if response.status == 200:
                         try:
-                            config_data = await response.json()
-                            # print(json.dumps(config_data, indent=4))
-                            myconfig = self.load_config(config_file)
+                            resp_data = await response.json()
+                            myconfig = self.config_data
                             options = myconfig['options']
-                            option_config = config_data['resources']
+                            option_config = resp_data['resources']
                             if option_config:
                                 for item in option_config:
                                     name = item['relayDescription']
@@ -114,21 +115,23 @@ class Config:
                                             option['off_time'] = relayOffTime if relayOffTime else 0
                                             option['state'] = relayState
                                             break
-                            if config_data['pauseTime'] is not None:
-                                self.pause_time = config_data['pauseTime']
+                            if resp_data['pauseTime'] is not None:
+                                self.pause_time = resp_data['pauseTime']
                                 if self.pause_time == 0:
                                     self.pause_time = 180
                                 self.pause_time = 60 if self.pause_time < 60 else self.pause_time                                
-                            if config_data['penaltyCost'] is not None:
-                                self.penalty_cost = config_data['penaltyCost']
+                            if resp_data['penaltyCost'] is not None:
+                                self.penalty_cost = resp_data['penaltyCost']
                                 if self.penalty_cost == 0:
                                     self.penalty_cost = 2000
                                 self.penalty_cost = 500 if self.penalty_cost < 500 else self.penalty_cost
                             myconfig['options'] = options
                             myconfig['pause_time'] = self.pause_time
                             myconfig['penalty_cost'] = self.penalty_cost
-                            self.save_config(json_data=myconfig)
-                            return myconfig
+                            if myconfig != self.config_data:
+                                self.save_config(json_data=myconfig)
+                                self.config_data = myconfig
+                                return myconfig
                         except Exception:
                             print(traceback.format_exc())
                     else:
