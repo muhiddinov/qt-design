@@ -19,17 +19,14 @@ class ProcessWindow(QWidget):
         self.output_pins = []
         self.process_data = []
         self.last_summa = 0
-        self.last_option = 'NONE'
         self.cash_sum = 0
         self.cash_sum_discount = 0
         self.pause_time = 0
         self.option_time :float = 0.0
-        self.current_option = None
         self.timer_counter = 0
         self.toggle_clock = False
         self.in_option = False
         self.pause_clicked = False
-        self.optoin_price = 0
         self.cash_data_post = False
         self.cash_data_sended = False
         self.penalty_time_cost = 2000
@@ -47,7 +44,11 @@ class ProcessWindow(QWidget):
         self.pause_time = float(self.config.pause_time)
         last_event = self.config.get_last_event()
         self.last_summa = last_event['summa']
-        self.last_option = last_event['option']
+        self.last_option = self.process_data[0]
+        for process in self.process_data:
+            if process['name'] == last_event['option']:
+                self.last_option = process
+                break
         self.penalty_time_cost = self.config.penalty_cost
         
         if self.last_summa > 0:
@@ -190,7 +191,7 @@ class ProcessWindow(QWidget):
                 self.cash_data_post = False
                 lbl_func_text = "PUL KIRITING!" if self.vip_client == False else "VIP"
             else:
-                lbl_func_text = f"{self.current_option['name']}"
+                lbl_func_text = f"{self.last_option['name']}"
                 lbl_timer_text = self.seconds_to_str(int(self.option_time), "%M:%S") if self.toggle_clock else self.seconds_to_str(int(self.option_time), "%M %S")
         lbl_value_text = f"{int(self.cash_sum)} {self.config.currency}" if self.vip_client == False else "PREMIUM"
         if lbl_timer_text != "":
@@ -224,7 +225,7 @@ class ProcessWindow(QWidget):
         if self.vip_client == False:
             self.cash_data_post = True
             self.cash_sum += self.config.currency_rate
-            self.option_time = int(self.cash_sum * 60 / self.current_option['price'])
+            self.option_time = int(self.cash_sum * 60 / self.last_option['price'])
             self.lbl_value.setText(f"{int(self.cash_sum)} {self.config.currency}")
 
     def execute_option(self, pin):
@@ -256,13 +257,12 @@ class ProcessWindow(QWidget):
     def execute(self, option):
         self.pause_clicked = False
         self.in_option = True
-        self.current_option = option
+        self.last_option = option
         option['off_time'] = 0 if option['state'] == False else option['off_time']
         if self.vip_client == False:
             self.option_time = self.cash_sum * 60 / option['price']
             self.cash_sum_discount = self.cash_sum / self.option_time / 10
             self.last_summa = self.cash_sum
-            self.last_option = option['name']
         while True:
             thread_relay = threading.Thread(target=self.control_relay, args=(option['relay_pin'], option['on_time'], option['off_time']))
             thread_relay.start()
