@@ -164,7 +164,7 @@ class ProcessWindow(QWidget):
                 lbl_func_text = "PAUSE"
                 self.pause_time -= 0.1
                 if self.pause_time <= 0:
-                    self.pause_clicked = False
+                    # self.pause_clicked = False
                     self.pause_time = 0
                     if self.cash_sum > 0:
                         if self.last_option['name'] != "JARIMA":
