@@ -128,7 +128,7 @@ class Config:
                             myconfig['options'] = options
                             myconfig['pause_time'] = self.pause_time
                             myconfig['penalty_cost'] = self.penalty_cost
-                            if myconfig != self.config_data:
+                            if myconfig != None:
                                 self.save_config(json_data=myconfig)
                                 self.config_data = myconfig
                                 print(self.config_data)
