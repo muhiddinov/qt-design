@@ -199,7 +199,7 @@ class ProcessWindow(QWidget):
         self.last_save_counter += 1
         if self.last_save_counter >= 10:
             self.last_save_counter = 0
-            res = self.config.save_last_event({"summa": int(lbl_value_text), "option": lbl_func_text})
+            res = self.config.save_last_event({"summa": int(self.cash_sum), "option": lbl_func_text})
             print(res)
     
     def pause_callback(self, pin):
