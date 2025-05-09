@@ -212,7 +212,7 @@ class ProcessWindow(QWidget):
                 file.close()
     
     def pause_callback(self, pin):
-        if self.pause_time > 0 and self.cash_sum > 0:
+        if self.pause_time > 0 or self.cash_sum > 0:
             self.pause_clicked = True
             self.in_option = False
         press_and_hold = False
