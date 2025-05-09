@@ -164,7 +164,7 @@ class ProcessWindow(QWidget):
                     # self.pause_clicked = False
                     self.pause_time = 0
                     if self.cash_sum > 0:
-                        self.in_option = True
+                        # self.in_option = True
                         self.option_time = self.cash_sum * 60 / self.penalty_time_cost
                         self.cash_sum_discount = self.cash_sum / self.penalty_time_cost / 10
                         self.cash_data_post = False
