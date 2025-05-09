@@ -257,8 +257,8 @@ class ProcessWindow(QWidget):
         while True:
             thread_relay = threading.Thread(target=self.control_relay, args=(option['relay_pin'], option['on_time'], option['off_time']))
             thread_relay.start()
-            thread_relay.join()
-            # time.sleep((option['on_time'] + option['off_time']) / 1000)
+            # thread_relay.join()
+            time.sleep((option['on_time'] + option['off_time']) / 1000)
             if self.pause_clicked:
                 break
             if self.cash_sum <= 0 and self.vip_client == False:
@@ -269,8 +269,8 @@ class ProcessWindow(QWidget):
     def control_relay(self, relay_pin, on_time, off_time):
         GPIO.output(relay_pin, GPIO.HIGH)
         time.sleep(on_time / 1000)
-        GPIO.output(relay_pin, GPIO.LOW)
         if off_time > 1:
+            GPIO.output(relay_pin, GPIO.LOW)
             time.sleep(off_time / 1000)
     
     def closeEvent(self, event):
