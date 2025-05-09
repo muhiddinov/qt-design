@@ -210,6 +210,7 @@ class ProcessWindow(QWidget):
     def pause_callback(self, pin):
         if self.pause_time > 0 and self.cash_sum > 0:
             self.pause_clicked = True
+            self.in_option = False
         press_and_hold = False
         start_time = time.time()
         while GPIO.input(pin) == GPIO.LOW:
