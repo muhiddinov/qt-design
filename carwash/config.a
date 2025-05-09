@@ -101,7 +101,7 @@
             "state": true
         }
     ],
-    "pause_time": 180,
+    "pause_time": 18,
     "penalty_cost": 1500,
     "currency": "so'm",
     "currency_rate": 500,
