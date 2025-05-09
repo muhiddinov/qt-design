@@ -59,7 +59,7 @@ class Config:
                 json_data = json.load(file)
                 file.close()
         except:
-            return json_data
+            pass
         return json_data
     
     def save_last_event(self, json_data) -> dict:
