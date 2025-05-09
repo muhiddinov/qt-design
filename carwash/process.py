@@ -51,6 +51,9 @@ class ProcessWindow(QWidget):
                 break
         self.penalty_time_cost = self.config.penalty_cost
         
+        asyncio.run(self.config.update_config())
+        self.process_data = self.config.config_data["options"]
+
         if self.last_summa > 0:
             self.cash_sum = self.last_summa
             self.pause_clicked = True
@@ -123,7 +126,6 @@ class ProcessWindow(QWidget):
         self.httptimer.timeout.connect(self.fetch_config_data)
         self.httptimer.start(5000) # 24 soat
         self.last_save_counter = 0
-        self.fetch_config_data()
         
     def fetch_config_data(self):
         if self.in_option or self.pause_clicked or self.vip_client:
