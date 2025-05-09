@@ -246,6 +246,7 @@ class ProcessWindow(QWidget):
             if self.cash_sum == 0:
                 self.vip_client = not self.vip_client
         else:
+            self.last_option = option
             if self.vip_client:
                 self.pause_clicked = True
                 time.sleep(2)
