@@ -131,6 +131,7 @@ class Config:
                             if myconfig != self.config_data:
                                 self.save_config(json_data=myconfig)
                                 self.config_data = myconfig
+                                print(self.config_data)
                                 return myconfig
                         except Exception:
                             print(traceback.format_exc())
