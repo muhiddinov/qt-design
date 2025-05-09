@@ -161,6 +161,7 @@ class ProcessWindow(QWidget):
             if self.pause_clicked:
                 if self.cash_sum <= 0:
                     self.pause_clicked = False
+                    return
                 lbl_func_text = "PAUSE"
                 self.pause_time -= 0.1
                 if self.pause_time <= 0:
@@ -173,6 +174,7 @@ class ProcessWindow(QWidget):
                             self.cash_sum_discount = self.cash_sum / self.penalty_time_cost / 10
                             self.cash_data_post = False
                             self.last_option['name'] = "JARIMA"
+                            self.pause_clicked = False
                 lbl_timer_text = self.seconds_to_str(int(self.pause_time), "%M:%S") if self.toggle_clock else self.seconds_to_str(int(self.pause_time), "%M %S")
             else:
                 self.pause_time = self.config.pause_time
