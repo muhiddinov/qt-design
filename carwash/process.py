@@ -43,7 +43,7 @@ class ProcessWindow(QWidget):
         self.out_pwr_en = self.config.out_pwr_en
         self.pause_time = float(self.config.pause_time)
         last_event = self.config.get_last_event()
-        self.last_summa = last_event['summa']
+        self.last_summa = int(last_event['summa'])
         self.last_option = self.process_data[0]
         for process in self.process_data:
             if process['name'] == last_event['option']:
@@ -215,7 +215,7 @@ class ProcessWindow(QWidget):
         if self.last_save_counter >= 10:
             self.last_save_counter = 0
             with open('last.a', 'w', encoding='utf-8') as file:
-                json.dump({"summa": int(self.cash_sum), "option": str(lbl_func_text)}, file)
+                json.dump({"summa": int(self.cash_sum)}, file)
                 file.close()
     
     def pause_callback(self, pin):

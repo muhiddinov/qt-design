@@ -53,11 +53,10 @@ class Config:
         return json_data
     
     def get_last_event(self) -> dict:
-        json_data = {'summa': 0, 'option': 'NONE'}
+        json_data = {'summa': 0}
         try:
             with open('last.a', 'r', encoding='utf-8') as file:
                 json_data = json.load(file)
-                print(json_data)
                 file.close()
         except:
             pass
