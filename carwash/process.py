@@ -121,10 +121,14 @@ class ProcessWindow(QWidget):
         self.httptimer = QTimer(self)
         self.httptimer.timeout.connect(self.fetch_config_data)
         self.httptimer.start(5000) # 24 soat
+<<<<<<< HEAD
+        self.stop_threads = False
+=======
         self.last_save_counter = 0
         self.enter_penalty = False
         self.last_clicked_btn = False
         self.last_clicked_btn_time = time.time()
+>>>>>>> 4784b789741e7beac749308e85795100c2e88c15
         
     def fetch_config_data(self):
         if self.in_option or self.pause_clicked or self.vip_client:
@@ -255,7 +259,11 @@ class ProcessWindow(QWidget):
             if self.cash_sum == 0:
                 self.vip_client = not self.vip_client
         else:
+<<<<<<< HEAD
+            self.stop_threads = True
+=======
             self.last_option = option
+>>>>>>> 4784b789741e7beac749308e85795100c2e88c15
             if self.vip_client:
                 self.pause_clicked = True
                 time.sleep(2)
@@ -281,22 +289,38 @@ class ProcessWindow(QWidget):
             self.cash_sum_discount = self.cash_sum / self.option_time / 10
             self.last_summa = self.cash_sum
         while True:
+<<<<<<< HEAD
+            if option['state']:
+                thread_relay = threading.Thread(target=self.control_relay, args=(option['relay_pin'], option['on_time'], option['off_time']))
+                thread_relay.start()
+            else:
+                GPIO.output(option['relay_pin'], GPIO.HIGH)
+            time.sleep((option['on_time'] + option['off_time']) / 1000)
+=======
             thread_relay = threading.Thread(target=self.control_relay, args=(option['relay_pin'], option['on_time'], option['off_time']))
             thread_relay.start()
             # thread_relay.join()
             time.sleep((option['on_time'] + option['off_time']) / 1000)
+>>>>>>> 4784b789741e7beac749308e85795100c2e88c15
             if self.pause_clicked:
                 break
             if self.cash_sum <= 0 and self.vip_client == False:
                 break
+<<<<<<< HEAD
+            if self.stop_threads:
+                break
         GPIO.output(option['relay_pin'], GPIO.LOW)
+=======
+        GPIO.output(option['relay_pin'], GPIO.LOW)
+>>>>>>> 4784b789741e7beac749308e85795100c2e88c15
         self.in_option = False
+        self.stop_threads = False
         
     def control_relay(self, relay_pin, on_time, off_time):
         GPIO.output(relay_pin, GPIO.HIGH)
         time.sleep(on_time / 1000)
+        GPIO.output(relay_pin, GPIO.LOW)
         if off_time > 1:
-            GPIO.output(relay_pin, GPIO.LOW)
             time.sleep(off_time / 1000)
     
     def closeEvent(self, event):
