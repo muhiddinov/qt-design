@@ -1,5 +1,4 @@
 import sqlite3
-import os
 
 class DataBase():
     def __init__(self, db_path: str = "assets/carwash.db") -> None:
@@ -95,6 +94,7 @@ class DataBase():
                 price REAL
             )
         ''')
+        self.connection.commit()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS relays (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -105,6 +105,13 @@ class DataBase():
                 on_time integer,
                 off_time integer,
                 price REAL
+            )
+        ''')
+        self.connection.commit()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS last (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                price INTEGER
             )
         ''')
         self.connection.commit()
