@@ -45,10 +45,6 @@ class ProcessWindow(QWidget):
         last_event = self.config.get_last_event()
         self.last_summa = int(last_event['summa'])
         self.last_option = self.process_data[0]
-        for process in self.process_data:
-            if process['name'] == last_event['option']:
-                self.last_option = process
-                break
         self.penalty_time_cost = self.config.penalty_cost
         
         asyncio.run(self.config.update_config())
