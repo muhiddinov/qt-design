@@ -1,7 +1,7 @@
 import sys
 import RPi.GPIO as GPIO
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
-from PyQt5.QtGui import QFontDatabase, QFont
+from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt, QTimer, QTime
 import time
 from utils import Config
@@ -126,6 +126,9 @@ class ProcessWindow(QWidget):
         self.httptimer.timeout.connect(self.fetch_config_data)
         self.httptimer.start(5000) # 24 soat
         self.last_save_counter = 0
+        self.enter_penalty = False
+        self.last_clicked_btn = False
+        self.last_clicked_btn_time = time.time()
         
     def fetch_config_data(self):
         if self.in_option or self.pause_clicked or self.vip_client:
@@ -167,14 +170,14 @@ class ProcessWindow(QWidget):
                 if self.pause_time <= 0:
                     # self.pause_clicked = False
                     self.pause_time = 0
-                    if self.cash_sum > 0:
-                        if self.last_option['name'] != "JARIMA":
-                            self.in_option = True
-                            self.option_time = self.cash_sum * 60 / self.penalty_time_cost
-                            self.cash_sum_discount = self.cash_sum / self.penalty_time_cost / 10
-                            self.cash_data_post = False
-                            self.last_option['name'] = "JARIMA"
-                            self.pause_clicked = False
+                    if self.cash_sum > 0 and self.enter_penalty == False:
+                        self.enter_penalty = True
+                        self.in_option = True
+                        self.option_time = self.cash_sum * 60 / self.penalty_time_cost
+                        self.cash_sum_discount = self.cash_sum / self.penalty_time_cost / 10
+                        self.cash_data_post = False
+                        self.last_option['name'] = "JARIMA"
+                        self.pause_clicked = False
                 lbl_timer_text = self.seconds_to_str(int(self.pause_time), "%M:%S") if self.toggle_clock else self.seconds_to_str(int(self.pause_time), "%M %S")
             else:
                 self.pause_time = self.config.pause_time
@@ -184,6 +187,8 @@ class ProcessWindow(QWidget):
                     lbl_func_text = "TANLANG!"
                 lbl_timer_text = QTime.currentTime().toString("hh:mm") if self.toggle_clock else QTime.currentTime().toString("hh mm")
         else:
+            if self.enter_penalty:
+                self.enter_penalty = False
             if self.vip_client == False:
                 self.option_time -= 0.1
                 self.cash_sum -= self.cash_sum_discount
@@ -236,12 +241,20 @@ class ProcessWindow(QWidget):
             self.lbl_value.setText(f"{int(self.cash_sum)} {self.config.currency}")
 
     def execute_option(self, pin):
+        if time.time() - self.last_clicked_btn_time < 1:
+            self.last_clicked_btn = True
+            return
+        else:
+            self.last_clicked_btn = False
+        self.last_clicked_btn_time = time.time()
+
         option = None
         for data in self.process_data:
             if data['button_pin'] == pin:
                 option = data
         if option is None:
             return
+        
         if option['name'] == 'VIP':
             if self.cash_sum == 0:
                 self.vip_client = not self.vip_client
