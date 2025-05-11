@@ -34,7 +34,6 @@ class ProcessWindow(QWidget):
         
         # Config faylidan ma'lumotlarni yuklash
         self.config = Config()
-        self.config.load_config()
         self.process_data = self.config.config_data["options"]
         self.output_pins = self.config.relay_pins
         self.input_pins = self.config.button_pins
