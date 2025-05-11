@@ -10,7 +10,7 @@ class Config:
         carwash = self.db.get_carwash()
         carwash['options'] = options
         self.config_data = carwash
-        print(self.config_data)
+        # print(self.config_data)
         self.relay_pins = [option['relay_port'] for option in options]
         self.button_pins = [option['btn_port'] for option in options]
         self.cash_pin = 21
