@@ -1,7 +1,5 @@
-import json
 import asyncio
 import aiohttp
-import traceback
 from database import Database
 
 class Config:
