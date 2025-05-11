@@ -41,8 +41,7 @@ class ProcessWindow(QWidget):
         self.pause_pin = self.config.pause_pin
         self.out_pwr_en = self.config.out_pwr_en
         self.pause_time = float(self.config.pause_time)
-        last_event = self.config.get_last_event()
-        self.last_summa = int(last_event['summa'])
+        self.last_summa = self.config.get_last_cash()
         self.last_option = self.process_data[0]
         self.penalty_time_cost = self.config.penalty_cost
         self.last_save_counter = 0
@@ -52,6 +51,7 @@ class ProcessWindow(QWidget):
         if self.last_summa > 0:
             self.cash_sum = self.last_summa
             self.pause_clicked = True
+            
         # GPIO sozlamalari
         GPIO.setmode(GPIO.BCM)
                 
