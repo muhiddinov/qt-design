@@ -1,7 +1,7 @@
 import sqlite3
 import json
 
-class DataBase():
+class DataBaseCarwash():
     def __init__(self, db_path: str = "assets/carwash.db") -> None:
         self.db_path = db_path
         self.create_tables()

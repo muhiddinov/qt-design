@@ -1,10 +1,10 @@
 import asyncio
 import aiohttp
-from .database import Database
+from db import DataBaseCarwash
 
 class Config:
     def __init__(self):
-        self.db = DataBase()
+        self.db = DataBaseCarwash()
         options = self.db.get_options()
         carwash = self.db.get_carwash()
         carwash['options'] = options
