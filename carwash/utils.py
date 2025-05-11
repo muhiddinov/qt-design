@@ -96,10 +96,10 @@ class Config:
                                 relayOffTime = int(item['relayOfTime'])
                                 relayState = item['relayMonitorStatus']
                                 for option in options:
-                                    if option['relay_pin'] == relayPort:
+                                    if option['relay_port'] == relayPort:
                                         option['name'] = name
                                         option['price'] = price
-                                        option['relay_pin'] = relayPort
+                                        option['relay_port'] = relayPort
                                         option['on_time'] = relayOnTime if relayOnTime else 0
                                         option['off_time'] = relayOffTime if relayOffTime else 0
                                         option['state'] = relayState
