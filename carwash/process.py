@@ -41,7 +41,7 @@ class ProcessWindow(QWidget):
         self.pause_pin = self.config.pause_pin
         self.out_pwr_en = self.config.out_pwr_en
         self.pause_time = float(self.config.pause_time)
-        self.last_summa = self.config.get_last_cash()
+        self.last_summa = self.config.cash_sum
         self.last_option = self.process_data[0]
         self.penalty_time_cost = self.config.penalty_cost
         self.last_save_counter = 0
