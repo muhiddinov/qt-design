@@ -1,6 +1,6 @@
 import asyncio
 import aiohttp
-from database import Database
+from .database import Database
 
 class Config:
     def __init__(self):
