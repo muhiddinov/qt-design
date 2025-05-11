@@ -174,4 +174,6 @@ class DataBase():
 if __name__ == "__main__":
     db = DataBase()
     options = db.get_options()
-    print(options)
+    print({"options" : options})
+    carwash = db.get_carwash()
+    print({"Carwash": carwash})
