@@ -1,9 +1,11 @@
 import sqlite3
 import json
 
-class DataBaseCarwash():
+class DataBase():
     def __init__(self, db_path: str = "assets/carwash.db") -> None:
         self.db_path = db_path
+        self.connection = self.connect()
+        self.connection.close()
         self.create_tables()
         self.connect()
         cursor = self.connection.cursor()
@@ -71,9 +73,6 @@ class DataBaseCarwash():
             )
             self.connection.commit()
             self.connection.close()
-            optoins = carwash['options']
-            if optoins:
-                self.update_option(optoins)
         except Exception as e:
             print(e)
             return None
@@ -127,7 +126,7 @@ class DataBaseCarwash():
         except:
             return None
         return options
-    
+
     def update_option(self, option: dict) -> dict:
         try:
             self.connect()
@@ -153,11 +152,13 @@ class DataBaseCarwash():
             return None
         return option
 
-    def connect(self) -> None:
+    def connect(self) -> sqlite3.Connection | None:
         try:
-            self.connection = sqlite3.connect(self.db_path)
-        except:
-            pass
+            conn = sqlite3.connect(self.db_path)
+            return conn
+        except Exception as e:
+            print(e)
+            return None
 
     def create_tables(self) -> None:
         self.connect()
@@ -218,7 +219,7 @@ class DataBaseCarwash():
                            'supersecret123', 
                            'qOMVzYh0JfXlfHkIWxq6VOO8dqIZ05Zy4fL6fqmPrY3dUHXAKK3mCckl5wyFJIAI',
                            'https://masofaviy-monitoring.uz/api/CarWashDevice/Resources/',
-                           'https://masofaviy-monitoring.uz/api/CarWashDevice/PaymentUpload',
+                           'https://masofaviy-monitoring.uz/api/CarWashDevice/PaymentUpload/',
                            180, 
                            1500, 
                            "so'm", 
