@@ -48,26 +48,27 @@ class DataBase():
         self.connection.close()
         return relays
     
-    def updateRelay(self, relay: dict) -> dict:
+    def update_option(self, optoin: dict) -> dict:
         self.connect()
-        name = relay["name"]
-        desc = relay["desc"]
-        port = relay["port"]
-        on_time = relay["on_time"]
-        off_time = relay["off_time"]
-        price = relay["price"]
+        name = optoin["name"]
+        btn_port = optoin["btn_port"]
+        relay_port = optoin["relay_port"]
+        status = optoin["status"]
+        on_time = optoin["on_time"]
+        off_time = optoin["off_time"]
+        price = optoin["price"]
         
         cursor = self.connection.cursor()
         cursor.execute(
             """
             UPDATE relays
-            SET name = ?, desc = ?, on_time = ?, off_time = ?, price = ?
+            SET name = ?, status = ?, on_time = ?, off_time = ?, price = ?
             WHERE port = ?
             """,
             (name, desc, on_time, off_time, price, port)
         )
         self.connection.commit()
-        cursor.execute(f"SELECT name, desc, port, on_time, off_time, price FROM relays WHERE port = {port}")
+        cursor.execute(f"SELECT name, relay_port, btn_port, status, on_time, off_time, price FROM relays WHERE port = {port}")
         data = cursor.fetchone()
         response = {
             "name": data[0],
@@ -96,11 +97,11 @@ class DataBase():
         ''')
         self.connection.commit()
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS relays (
+            CREATE TABLE IF NOT EXISTS optoins (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT,
-                desc TEXT,
-                port integer,
+                relay_port integer,
+                btn_port integer,
                 status boolean,
                 on_time integer,
                 off_time integer,
@@ -116,25 +117,19 @@ class DataBase():
         ''')
         self.connection.commit()
         self.connection.close()
-        
-    def insert_default_data(self) -> None:
+    
+    def insert_default_data_options(self) -> None:
         self.connect()
         cursor = self.connection.cursor()
-        cursor.execute("INSERT INTO relays (name, desc, port, status, on_time, off_time, price) VALUES ('Relay 1', 'Relay 1', 27, 0, 800, 200, 2000.0)")
-        cursor.execute("INSERT INTO relays (name, desc, port, status, on_time, off_time, price) VALUES ('Relay 2', 'Relay 1', 22, 0, 800, 200, 2000.0)")
-        cursor.execute("INSERT INTO relays (name, desc, port, status, on_time, off_time, price) VALUES ('Relay 3', 'Relay 1', 10, 0, 800, 200, 2000.0)")
-        cursor.execute("INSERT INTO relays (name, desc, port, status, on_time, off_time, price) VALUES ('Relay 4', 'Relay 1', 9, 0, 800, 200, 2000.0)")
-        cursor.execute("INSERT INTO relays (name, desc, port, status, on_time, off_time, price) VALUES ('Relay 5', 'Relay 1', 11, 0, 800, 200, 2000.0)")
-        cursor.execute("INSERT INTO relays (name, desc, port, status, on_time, off_time, price) VALUES ('Relay 6', 'Relay 1', 5, 0, 800, 200, 2000.0)")
-        cursor.execute("INSERT INTO relays (name, desc, port, status, on_time, off_time, price) VALUES ('Relay 7', 'Relay 1', 6, 0, 800, 200, 2000.0)")
-        cursor.execute("INSERT INTO relays (name, desc, port, status, on_time, off_time, price) VALUES ('Relay 8', 'Relay 1', 13, 0, 800, 200, 2000.0)")
-        cursor.execute("INSERT INTO relays (name, desc, port, status, on_time, off_time, price) VALUES ('Relay 9', 'Relay 1', 19, 0, 800, 200, 2000.0)")
-        cursor.execute("INSERT INTO relays (name, desc, port, status, on_time, off_time, price) VALUES ('Relay 10', 'Relay 1', 26, 0, 800, 200, 2000.0)")
+        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 1', 27,  2,  0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 2', 22,  3,  0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 3', 10,  18, 0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 4', 9,   23, 0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 5', 11,  24, 0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 6', 5,   25, 0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 7', 6,   8,  0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 8', 13,  7,  0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 9', 19,  12, 0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 10', 26, 16, 0, 800, 200, 3000.0)")
         self.connection.commit()
-        self.connection.close()
-    
-    def get_database(self):
-        return self.connection
-
-    def close(self):
         self.connection.close()
