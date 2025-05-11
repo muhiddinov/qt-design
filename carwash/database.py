@@ -1,29 +1,89 @@
 import sqlite3
+import json
 
 class DataBase():
     def __init__(self, db_path: str = "assets/carwash.db") -> None:
         self.db_path = db_path
-        self.connection = sqlite3.connect(self.db_path)
         self.create_tables()
         self.connect()
         cursor = self.connection.cursor()
-        cursor.execute("select * from optoins")
-        if cursor.fetchall() == None:
+        cursor.execute("select * from options")
+        if len(cursor.fetchall()) == 0:
             self.insert_default_data_options()
         self.connect()
         cursor = self.connection.cursor()
         cursor.execute("select * from carwash")
-        if cursor.fetchall() == None:
+        if len(cursor.fetchall()) == 0:
             self.insert_default_data_carwash()
         self.connection.close()
         
-    def get_carwash(self) -> dict:
+    def get_last_cash(self) -> int:
+        cash = 0
+        try:
+            self.connect()
+            cursor = self.connection.cursor()
+            cursor.execute("select price from last")
+            data = cursor.fetchone()[0]
+            if data is not None:
+                cash = int(data)
+            self.connection.close()
+        except Exception as e:
+            return None
+        return cash
+    
+    def put_last_cash(self, cash: int = 0) -> int:
+        try:
+            self.connect()
+            cursor = self.connection.cursor()
+            cursor.execute("select price from last")
+            data = cursor.fetchone()
+            if data == None:
+                cursor.execute("insert into last(id, price) values(?, ?)", (1, cash))
+            else:
+                cursor.execute("update last set price = ? where id = 1", (cash,))
+            self.connection.commit()
+            self.connection.close()
+        except Exception as e:
+            return None
+        return cash
+    
+    def update_carwash(self, carwash: dict) -> dict | None:
+        try:
+            self.connect()
+            username = carwash["username"]
+            password = carwash["password"]
+            device_id = carwash["device_id"]
+            url_config = carwash["url_config"]
+            url_cash = carwash["url_cash"]
+            pause_time = carwash["pause_time"]
+            penalty_cost = carwash["penalty_cost"]
+            currency = carwash["currency"]
+            currency_rate = carwash["currency_rate"]
+            cursor = self.connection.cursor()
+            cursor.execute(
+                """
+                update carwash
+                set username = ?, password = ?, device_id = ?, url_config = ?, url_cash = ?, 
+                pause_time = ?, penalty_cost = ?, currency = ?, currency_rate = ?
+                where username = ?
+                """,
+                (username, password, device_id, url_config, url_cash, pause_time, penalty_cost, currency, currency_rate, username)
+            )
+            self.connection.commit()
+            self.connection.close()
+        except Exception as e:
+            print(e)
+            return None
+        return carwash
+    
+    
+    def get_carwash(self) -> dict | None:
         carwash = None
         try:
             self.connect()
             cursor = self.connection.cursor()
             cursor.execute("select username, password, device_id, url_config, url_cash, pause_time, penalty_cost, currency, currency_rate from carwash")
-            data = cursor.fetchall()
+            data = cursor.fetchone()
             carwash = {
                 'username':         data[0],
                 'password':         data[1],
@@ -65,38 +125,30 @@ class DataBase():
             return None
         return options
     
-    def update_option(self, optoin: dict) -> dict:
-        self.connect()
-        name = optoin["name"]
-        btn_port = optoin["btn_port"]
-        relay_port = optoin["relay_port"]
-        status = optoin["status"]
-        on_time = optoin["on_time"]
-        off_time = optoin["off_time"]
-        price = optoin["price"]
-        cursor = self.connection.cursor()
-        cursor.execute(
-            """
-            update options
-            set name = ?, relay_port = ?, btn_port = ?, status = ?, on_time = ?, off_time = ?, price = ?
-            where port = ?
-            """,
-            (name, relay_port, btn_port, status, on_time, off_time, price, relay_port)
-        )
-        self.connection.commit()
-        cursor.execute(f"select name, relay_port, btn_port, status, on_time, off_time, price from relays where port = {relay_port}")
-        data = cursor.fetchone()
-        response = {
-            "name":         data[0],
-            "relay_port":   data[1],
-            "btn_port":     data[2],
-            "status":       data[3],
-            "on_time":      data[5],
-            "off_time":     data[5],
-            "price":        data[6]
-        }   
-        self.connection.close()
-        return response
+    def update_option(self, option: dict) -> dict:
+        try:
+            self.connect()
+            name = option["name"]
+            btn_port = option["btn_port"]
+            relay_port = option["relay_port"]
+            status = option["status"]
+            on_time = option["on_time"]
+            off_time = option["off_time"]
+            price = option["price"]
+            cursor = self.connection.cursor()
+            cursor.execute(
+                """
+                update options
+                set name = ?, relay_port = ?, btn_port = ?, status = ?, on_time = ?, off_time = ?, price = ?
+                where relay_port = ?
+                """,
+                (name, relay_port, btn_port, status, on_time, off_time, price, relay_port)
+            )
+            self.connection.commit()
+            self.connection.close()
+        except:
+            return None
+        return option
 
     def connect(self) -> None:
         try:
@@ -123,7 +175,7 @@ class DataBase():
         ''')
         self.connection.commit()
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS optoins (
+            CREATE TABLE IF NOT EXISTS options (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT,
                 relay_port INTEGER,
@@ -148,34 +200,59 @@ class DataBase():
     def insert_default_data_carwash(self) -> None:
         self.connect()
         cursor = self.connection.cursor()
-        cursor.execute('''INSERT INTO carwash 
-                       (username, password, device_id, url_config, url_cash, pause_time, penalty_cost, currency, currency_rate) 
-                       VALUES ('deviceuser', 'supersecret123', 'qOMVzYh0JfXlfHkIWxq6VOO8dqIZ05Zy4fL6fqmPrY3dUHXAKK3mCckl5wyFJIAI'
-                       'https://masofaviy-monitoring.uz/api/CarWashDevice/Resources/',
-                       'https://masofaviy-monitoring.uz/api/CarWashDevice/PaymentUpload',
-                       180, 1500, 'so'm', 500)''')
+        cursor.execute('''INSERT INTO carwash (
+                            username, 
+                            password, 
+                            device_id, 
+                            url_config, 
+                            url_cash, 
+                            pause_time, 
+                            penalty_cost, 
+                            currency, 
+                            currency_rate
+                        ) VALUES (
+                           'deviceuser', 
+                           'supersecret123', 
+                           'qOMVzYh0JfXlfHkIWxq6VOO8dqIZ05Zy4fL6fqmPrY3dUHXAKK3mCckl5wyFJIAI',
+                           'https://masofaviy-monitoring.uz/api/CarWashDevice/Resources/',
+                           'https://masofaviy-monitoring.uz/api/CarWashDevice/PaymentUpload',
+                           180, 
+                           1500, 
+                           "so'm", 
+                           500
+                        )
+                        ''')
         self.connection.commit()
         self.connection.close()
     
     def insert_default_data_options(self) -> None:
         self.connect()
         cursor = self.connection.cursor()
-        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 1',  27,  2,  0, 800, 200, 3000.0)")
-        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 2',  22,  3,  0, 800, 200, 3000.0)")
-        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 3',  10,  18, 0, 800, 200, 3000.0)")
-        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 4',  9,   23, 0, 800, 200, 3000.0)")
-        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 5',  11,  24, 0, 800, 200, 3000.0)")
-        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 6',  5,   25, 0, 800, 200, 3000.0)")
-        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 7',  6,   8,  0, 800, 200, 3000.0)")
-        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 8',  13,  7,  0, 800, 200, 3000.0)")
-        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 9',  19,  12, 0, 800, 200, 3000.0)")
-        cursor.execute("INSERT INTO relays (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 10', 26,  16, 0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO options (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 1',  27,  2,  0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO options (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 2',  22,  3,  0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO options (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 3',  10,  18, 0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO options (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 4',  9,   23, 0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO options (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 5',  11,  24, 0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO options (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 6',  5,   25, 0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO options (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 7',  6,   8,  0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO options (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 8',  13,  7,  0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO options (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 9',  19,  12, 0, 800, 200, 3000.0)")
+        cursor.execute("INSERT INTO options (name, relay_port, btn_port, status, on_time, off_time, price) VALUES ('OPTION 10', 26,  16, 0, 800, 200, 3000.0)")
         self.connection.commit()
         self.connection.close()
         
 if __name__ == "__main__":
     db = DataBase()
     options = db.get_options()
-    print({"options" : options})
     carwash = db.get_carwash()
-    print({"Carwash": carwash})
+    resp = db.put_last_cash(3000)
+    if resp != None:
+        print("updated cash", db.get_last_cash())
+    carwash['options'] = options
+    carwash['pause_time'] = 200
+    resp = db.update_carwash(carwash=carwash)
+    if resp == None:
+        print("Error on update_carwash")
+    else:
+        print("Succes!", resp)
+    config = json.dumps(carwash, indent=4)
