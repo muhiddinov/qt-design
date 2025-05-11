@@ -4,8 +4,7 @@ import json
 class DataBase():
     def __init__(self, db_path: str = "assets/carwash.db") -> None:
         self.db_path = db_path
-        self.connection = self.connect()
-        self.connection.close()
+        self.connection = None
         self.create_tables()
         self.connect()
         cursor = self.connection.cursor()
@@ -152,13 +151,11 @@ class DataBase():
             return None
         return option
 
-    def connect(self) -> sqlite3.Connection | None:
+    def connect(self):
         try:
-            conn = sqlite3.connect(self.db_path)
-            return conn
+            self.connection = sqlite3.connect(self.db_path)
         except Exception as e:
             print(e)
-            return None
 
     def create_tables(self) -> None:
         self.connect()
