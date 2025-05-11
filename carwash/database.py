@@ -72,7 +72,8 @@ class DataBase():
             self.connection.commit()
             self.connection.close()
             optoins = carwash['options']
-            self.update_option(optoins)
+            if optoins:
+                self.update_option(optoins)
         except Exception as e:
             print(e)
             return None
