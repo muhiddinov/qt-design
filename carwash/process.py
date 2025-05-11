@@ -46,7 +46,7 @@ class ProcessWindow(QWidget):
         self.last_summa = int(last_event['summa'])
         self.last_option = self.process_data[0]
         self.penalty_time_cost = self.config.penalty_cost
-        
+        self.last_save_counter = 0
         asyncio.run(self.config.update_config())
         self.process_data = self.config.config_data["options"]
 
