@@ -120,7 +120,7 @@ class Config:
                         myconfig['penalty_cost'] = self.penalty_cost
                         self.save_config(config=myconfig)
                         self.config_data = myconfig
-                        print(json.dumps(self.config_data, indent=4))
+                        # print(json.dumps(self.config_data, indent=4))
                         return myconfig
                     else:
                         print(f"Failed to fetch config data. Status code: {response.status}")
