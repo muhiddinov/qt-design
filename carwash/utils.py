@@ -117,7 +117,7 @@ class Config:
                         myconfig['options'] = options
                         myconfig['pause_time'] = self.pause_time
                         myconfig['penalty_cost'] = self.penalty_cost
-                        self.save_config(json_data=myconfig)
+                        self.save_config(config=myconfig)
                         self.config_data = myconfig
                         print(self.config_data)
                         return myconfig
