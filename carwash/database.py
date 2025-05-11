@@ -10,6 +10,8 @@ class DataBase():
         cursor.execute("select * from optoins")
         if cursor.fetchall() == None:
             self.insert_default_data_options()
+        self.connect()
+        cursor = self.connection.cursor()
         cursor.execute("select * from carwash")
         if cursor.fetchall() == None:
             self.insert_default_data_carwash()
