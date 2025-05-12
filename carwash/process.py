@@ -155,6 +155,7 @@ class ProcessWindow(QWidget):
             
         if self.in_option == False and self.pause_clicked == False:
             self.timer_ads += 0.1
+            print(self.timer_ads)
             if self.timer_ads >= 30:
                 self.browser_process = subprocess.Popen([
                     'chromium-browser',
