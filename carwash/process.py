@@ -166,7 +166,7 @@ class ProcessWindow(QWidget):
                     '--start-fullscreen',
                     '--incognito',
                     '--no-sandbox',
-                    'http://localhost'])
+                    'http://127.0.0.1'])
                 self.browser_opened = True
             
         if self.in_option == False:
