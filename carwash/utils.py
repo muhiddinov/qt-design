@@ -107,14 +107,14 @@ class Config:
                                         break
                         if resp_data['pauseTime'] is not None:
                             self.pause_time = resp_data['pauseTime']
-                            if self.pause_time == 0:
-                                self.pause_time = 180
-                            self.pause_time = 60 if self.pause_time < 60 else self.pause_time                                
+                            # if self.pause_time == 0:
+                            #     self.pause_time = 180
+                            # self.pause_time = 60 if self.pause_time < 60 else self.pause_time                                
                         if resp_data['penaltyCost'] is not None:
                             self.penalty_cost = resp_data['penaltyCost']
-                            if self.penalty_cost == 0:
-                                self.penalty_cost = 2000
-                            self.penalty_cost = 500 if self.penalty_cost < 500 else self.penalty_cost
+                            # if self.penalty_cost == 0:
+                            #     self.penalty_cost = 2000
+                            # self.penalty_cost = 500 if self.penalty_cost < 500 else self.penalty_cost
                         myconfig['options'] = options
                         myconfig['pause_time'] = self.pause_time
                         myconfig['penalty_cost'] = self.penalty_cost
