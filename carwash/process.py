@@ -165,6 +165,7 @@ class ProcessWindow(QWidget):
                     '--disable-session-crashed-bubble',
                     '--start-fullscreen',
                     '--incognito',
+                    '--no-sandbox',
                     'http://localhost'])
                 self.browser_opened = True
             
