@@ -167,6 +167,7 @@ class ProcessWindow(QWidget):
                     '--no-sandbox',
                     '--kiosk',
                     'http://127.0.0.1'])
+                self.hide()
                 self.browser_opened = True
             
         if self.in_option == False:
