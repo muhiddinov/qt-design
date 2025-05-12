@@ -7,7 +7,7 @@ import time
 from utils import Config
 import threading
 import asyncio
-import json
+import subprocess
 
 class ProcessWindow(QWidget):
     def __init__(self):
@@ -119,6 +119,9 @@ class ProcessWindow(QWidget):
         self.httptimer.timeout.connect(self.fetch_config_data)
         self.httptimer.start(5000) # 24 soat#
         self.penalty_process = False
+        self.timer_ads = 0.0
+        self.browser_process = None
+
         
     def fetch_config_data(self):
         if self.in_option or self.pause_clicked or self.vip_client:
@@ -149,6 +152,18 @@ class ProcessWindow(QWidget):
         if self.timer_counter >= 5:
             self.timer_counter = 0
             self.toggle_clock = not self.toggle_clock
+            
+        if self.in_option == False and self.pause_clicked == False:
+            self.timer_ads += 0.1
+            if self.timer_ads >= 30:
+                self.browser_process = subprocess.Popen([
+                    'chromium-browser',
+                    '--kiosk',
+                    '--noerrdialogs',
+                    '--disable-session-crashed-bubble',
+                    '--start-fullscreen',
+                    '--incognito',
+                    'http://localhost'])
             
         if self.in_option == False:
             if self.pause_clicked:
@@ -200,6 +215,8 @@ class ProcessWindow(QWidget):
             self.config.save_last_cash(int(self.cash_sum))
     
     def pause_callback(self, pin):
+        if self.browser_process != None:
+            self.browser_process.terminate()
         if self.pause_time > 0 or self.cash_sum > 0:
             self.pause_clicked = True
             self.in_option = False
@@ -215,12 +232,16 @@ class ProcessWindow(QWidget):
             self.pause_clicked = False
         
     def cash_callback(self, pin):
+        if self.browser_process != None:
+            self.browser_process.terminate()
         self.cash_data_post = True
         self.cash_sum += self.config.currency_rate
         self.option_time = int(self.cash_sum * 60 / self.last_option['price'])
         self.lbl_value.setText(f"{int(self.cash_sum)} {self.config.currency}")
 
     def execute_option(self, pin):
+        if self.browser_process != None:
+            self.browser_process.terminate()
         option = None
         for data in self.process_data:
             if data['btn_port'] == pin:
