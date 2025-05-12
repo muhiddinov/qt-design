@@ -160,12 +160,12 @@ class ProcessWindow(QWidget):
             if self.timer_ads >= 30.0 and self.browser_opened == False:
                 self.browser_process = subprocess.Popen([
                     'chromium-browser',
-                    '--kiosk',
                     '--noerrdialogs',
                     '--disable-session-crashed-bubble',
                     '--start-fullscreen',
                     '--incognito',
                     '--no-sandbox',
+                    '--kiosk',
                     'http://127.0.0.1'])
                 self.browser_opened = True
             
