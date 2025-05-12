@@ -224,6 +224,7 @@ class ProcessWindow(QWidget):
             self.browser_process.terminate()
             self.timer_ads = 0.0
             self.browser_opened = False
+            self.showFullScreen()
         if self.pause_time > 0 or self.cash_sum > 0:
             self.pause_clicked = True
             self.in_option = False
@@ -243,6 +244,7 @@ class ProcessWindow(QWidget):
             self.browser_process.terminate()
             self.timer_ads = 0.0
             self.browser_opened = False
+            self.showFullScreen()
         self.cash_data_post = True
         self.cash_sum += self.config.currency_rate
         self.option_time = int(self.cash_sum * 60 / self.last_option['price'])
@@ -253,6 +255,7 @@ class ProcessWindow(QWidget):
             self.browser_process.terminate()
             self.browser_opened = False
             self.timer_ads = 0.0
+            self.showFullScreen()
         option = None
         for data in self.process_data:
             if data['btn_port'] == pin:
