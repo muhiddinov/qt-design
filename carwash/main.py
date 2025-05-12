@@ -5,11 +5,6 @@ from PyQt5.QtCore import QTimer, Qt
 import sys
 from process import ProcessWindow
 from splash import SplashWindow
-import os
-
-env = os.environ.copy()
-env['DISPLAY'] = ':0'
-env['XAUTHORITY'] = '/home/eas/.Xauthority'
 
 """
 import subprocess

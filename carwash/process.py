@@ -123,12 +123,8 @@ class ProcessWindow(QWidget):
         self.penalty_process = False
         self.timer_ads = 0.0
         self.browser_process = None
-        self.env = None
         self.browser_opened = False
 
-    def setEnv(self, env: dict[str, str]):
-        self.env = env
-        
     def fetch_config_data(self):
         if self.in_option or self.pause_clicked or self.vip_client:
             return
