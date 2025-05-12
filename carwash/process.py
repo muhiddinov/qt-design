@@ -75,7 +75,7 @@ class ProcessWindow(QWidget):
         
         # fontlarni yuklash
         self.font = QFont("FreeSerif")
-        self.font.setPixelSize(500)
+        self.font.setPixelSize(400)
 
         # Label yaratish
         self.lbl_timer = QLabel(self)
@@ -85,7 +85,7 @@ class ProcessWindow(QWidget):
         self.lbl_timer_str = "--:--"
         self.lbl_timer.setText(self.lbl_timer_str)
 
-        self.font.setPixelSize(200)
+        self.font.setPixelSize(130)
         self.lbl_value = QLabel(self)
         self.lbl_value.setFont(self.font)
         self.lbl_value.setStyleSheet("color: red; background-color: black;")
