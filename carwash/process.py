@@ -168,7 +168,6 @@ class ProcessWindow(QWidget):
                     '--disable-session-crashed-bubble',
                     '--start-fullscreen',
                     '--incognito',
-                    '--no-sandbox',
                     '--kiosk',
                     'http://127.0.0.1'], env=env)
                 # self.hide()
