@@ -121,6 +121,7 @@ class ProcessWindow(QWidget):
         self.penalty_process = False
         self.timer_ads = 0.0
         self.browser_process = None
+        self.browser_opened = False
 
         
     def fetch_config_data(self):
@@ -156,7 +157,7 @@ class ProcessWindow(QWidget):
         if self.in_option == False and self.pause_clicked == False:
             self.timer_ads += 0.1
             print(self.timer_ads)
-            if self.timer_ads >= 30:
+            if self.timer_ads >= 30.0 and self.browser_opened == False:
                 self.browser_process = subprocess.Popen([
                     'chromium-browser',
                     '--kiosk',
@@ -165,6 +166,7 @@ class ProcessWindow(QWidget):
                     '--start-fullscreen',
                     '--incognito',
                     'http://localhost'])
+                self.browser_opened = True
             
         if self.in_option == False:
             if self.pause_clicked:
@@ -219,6 +221,7 @@ class ProcessWindow(QWidget):
         if self.browser_process != None:
             self.browser_process.terminate()
             self.timer_ads = 0.0
+            self.browser_opened = False
         if self.pause_time > 0 or self.cash_sum > 0:
             self.pause_clicked = True
             self.in_option = False
@@ -237,6 +240,7 @@ class ProcessWindow(QWidget):
         if self.browser_process != None:
             self.browser_process.terminate()
             self.timer_ads = 0.0
+            self.browser_opened = False
         self.cash_data_post = True
         self.cash_sum += self.config.currency_rate
         self.option_time = int(self.cash_sum * 60 / self.last_option['price'])
@@ -245,6 +249,7 @@ class ProcessWindow(QWidget):
     def execute_option(self, pin):
         if self.browser_process != None:
             self.browser_process.terminate()
+            self.browser_opened = False
             self.timer_ads = 0.0
         option = None
         for data in self.process_data:
