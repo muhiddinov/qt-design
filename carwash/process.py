@@ -8,7 +8,6 @@ from utils import Config
 import threading
 import asyncio
 import subprocess
-import os
 
 
 class ProcessWindow(QWidget):
@@ -159,9 +158,6 @@ class ProcessWindow(QWidget):
             self.timer_ads += 0.1
             print(self.timer_ads)
             if self.timer_ads >= 10.0 and self.browser_opened == False:
-                env = os.environ.copy()
-                env['DISPLAY'] = ':0'
-                env['XAUTHORITY'] = '/home/eas/.Xauthority'
                 self.browser_process = subprocess.Popen([
                     'chromium-browser',
                     '--noerrdialogs',
@@ -169,7 +165,7 @@ class ProcessWindow(QWidget):
                     '--start-fullscreen',
                     '--incognito',
                     '--kiosk',
-                    'http://127.0.0.1'], env=env)
+                    'http://127.0.0.1'])
                 # self.hide()
                 self.browser_opened = True
             

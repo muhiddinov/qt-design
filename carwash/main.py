@@ -6,29 +6,6 @@ import sys
 from process import ProcessWindow
 from splash import SplashWindow
 
-"""
-import subprocess
-import time
-
-# Start the browser
-browser_process = subprocess.Popen([
-        'chromium-browser',
-        '--kiosk',
-        '--noerrdialogs',
-        '--disable-session-crashed-bubble',
-        '--start-fullscreen',
-        '--incognito',
-        'http://localhost'])
-
-# Wait for 20 seconds before closing (simulate viewing time)
-time.sleep(20)
-
-# Close the browser
-browser_process.terminate()
-
-"""
-
-
 class MainApp:
     def __init__(self):
         self.app = QApplication(sys.argv)
