@@ -5,6 +5,11 @@ from PyQt5.QtCore import QTimer, Qt
 import sys
 from process import ProcessWindow
 from splash import SplashWindow
+import os
+
+env = os.environ.copy()
+env['DISPLAY'] = ':0'
+env['XAUTHORITY'] = '/home/eas/.Xauthority'
 
 """
 import subprocess
@@ -39,14 +44,15 @@ class MainApp:
         self.process.setWindowSize(self.screen_size)
         self.process.setWindowTitle("Process Screen")
         self.process.setCursor(Qt.BlankCursor)
+        self.process.showFullScreen()
         
-        self.splash = SplashWindow()
-        self.splash.setGeometry(0, 0, self.screen_size.width(), self.screen_size.height())
-        self.splash.setWindowTitle("Splash Screen")
-        self.splash.showFullScreen()
-        self.splash.setNextWindow(self.process)
-        self.splash.setCursor(Qt.BlankCursor)
-        QTimer.singleShot(5000, self.splash.start_main_app)
+        # self.splash = SplashWindow()
+        # self.splash.setGeometry(0, 0, self.screen_size.width(), self.screen_size.height())
+        # self.splash.setWindowTitle("Splash Screen")
+        # self.splash.showFullScreen()
+        # self.splash.setNextWindow(self.process)
+        # self.splash.setCursor(Qt.BlankCursor)
+        # QTimer.singleShot(5000, self.splash.start_main_app)
 
     def run(self):
         sys.exit(self.app.exec())
