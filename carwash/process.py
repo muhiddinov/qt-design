@@ -33,6 +33,7 @@ class ProcessWindow(QWidget):
         self.penalty_time_cost = 2000
         self.vip_client = False
         self.asyncFunkSignal.connect(self.fetch_config_data, Qt.QueuedConnection)
+        self.asyncFunkSignal.emit()
         # Config faylidan ma'lumotlarni yuklash
         self.config = Config()
         self.process_data = self.config.config_data["options"]
