@@ -117,7 +117,8 @@ class ProcessWindow(QWidget):
         
         self.httptimer = QTimer(self)
         self.httptimer.timeout.connect(self.fetch_config_data)
-        self.httptimer.start(24 * 3600 * 1000) # 24 soat#
+        self.httptimer.start(10000)
+        
         self.penalty_process = False
         self.timer_ads = 0.0
         self.browser_process = None
@@ -127,6 +128,7 @@ class ProcessWindow(QWidget):
         self.process_data = self.config.config_data["options"]
         self.pause_time = float(self.config.pause_time)
         self.penalty_time_cost = self.config.penalty_cost
+        self.httptimer.stop()
 
     def fetch_config_data(self):
         if self.in_option or self.pause_clicked or self.vip_client:
