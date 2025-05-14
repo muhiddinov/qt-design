@@ -104,7 +104,7 @@ class Config:
                                         option['relay_port'] = relayPort
                                         option['on_time'] = relayOnTime if relayOnTime else 0
                                         option['off_time'] = relayOffTime if relayOffTime else 0
-                                        option['state'] = relayState
+                                        option['status'] = relayState
                                         break
                         if resp_data['pauseTime'] is not None:
                             self.pause_time = resp_data['pauseTime']
