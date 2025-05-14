@@ -281,6 +281,7 @@ class ProcessWindow(QWidget):
         self.cash_sum_discount = self.cash_sum / self.option_time / 10
         while True:
             if option['state']:
+                print(option)
                 thread_relay = threading.Thread(target=self.control_relay, args=(option['relay_port'], option['on_time'], option['off_time']))
                 thread_relay.start()
             else:
