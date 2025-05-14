@@ -214,7 +214,7 @@ class DataBase():
                         ) VALUES (
                            'deviceuser', 
                            'supersecret123', 
-                           'qOMVzYh0JfXlfHkIWxq6VOO8dqIZ05Zy4fL6fqmPrY3dUHXAKK3mCckl5wyFJIAI',
+                           'vAJxKKExTEKyzYiZOCvctlt9TzqyiqQIKlj0fcBcpO0rFUmWO5qzF0S1KRRMc3G4',
                            'https://masofaviy-monitoring.uz/api/CarWashDevice/Resources/',
                            'https://masofaviy-monitoring.uz/api/CarWashDevice/PaymentUpload/',
                            180, 

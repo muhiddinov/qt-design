@@ -156,7 +156,6 @@ class ProcessWindow(QWidget):
             
         if self.in_option == False and self.pause_clicked == False:
             self.timer_ads += 0.1
-            print(self.timer_ads)
             if self.timer_ads >= 10.0 and self.browser_opened == False:
                 self.browser_process = subprocess.Popen([
                     'chromium-browser',
@@ -188,7 +187,8 @@ class ProcessWindow(QWidget):
                     self.pause_time = 0
                 lbl_timer_text = self.seconds_to_str(int(self.pause_time), "%M:%S") if self.toggle_clock else self.seconds_to_str(int(self.pause_time), "%M %S")
             else:
-                self.cash_data_post = False
+                if self.cash_sum <= 0:
+                    self.cash_data_post = False
                 self.pause_time = self.config.pause_time
                 self.penalty_process = False
                 lbl_func_text = "PUL KIRITING!" if self.cash_sum <= 0 else "PUL KIRITILDI!"

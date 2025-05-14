@@ -3,14 +3,14 @@ Description=Carwash PyQt5 GUI
 After=network.target graphical.target
 
 [Service]
-WorkingDirectory=/var/www/carwash
-ExecStart=/var/www/carwash/main.py
+WorkingDirectory=/home/eas/carwash
+ExecStart=/home/eas/carwash/main.py
 Restart=on-failure
 RestartSec=5s
 Environment=DISPLAY=:0
-Environment=XAUTHORITY=/home/pi/.Xauthority
-User=pi
-Group=pi
+Environment=XAUTHORITY=/home/eas/.Xauthority
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+User=eas
 
 [Install]
 WantedBy=graphical.target
