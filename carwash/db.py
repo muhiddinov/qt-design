@@ -74,7 +74,7 @@ class DataBase():
                 (username, password, device_id, url_config, url_cash, pause_time, penalty_cost, currency, currency_rate, username)
             )
             self.connection.commit()
-            print('Success carwash update!')
+            # print('Success carwash update!')
             self.connection.close()
         except Exception as e:
             print(e)
@@ -150,7 +150,7 @@ class DataBase():
                 """,
                 (name, relay_port, btn_port, status, on_time, off_time, price, relay_port)
             )
-            print('Success update option')
+            # print('Success update option')
             # self.connection.commit()
             # self.connection.close()
         except Exception as e:
