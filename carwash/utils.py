@@ -74,9 +74,6 @@ class Config:
             return {"Error": str(e)}
         return data
     
-    async def update_config(self):
-        await self.fetch_config_data()
-        
     async def fetch_config_data(self) -> dict:
         url = self.url_config + self.device_id
         auth = aiohttp.BasicAuth(self.username, self.password)

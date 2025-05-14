@@ -2,7 +2,7 @@ import sys
 import RPi.GPIO as GPIO
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
 from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt, QTimer, QTime
+from PyQt5.QtCore import Qt, QTimer, QTime, pyqtSignal
 import time
 from utils import Config
 import threading
@@ -11,6 +11,7 @@ import subprocess
 
 
 class ProcessWindow(QWidget):
+    asyncFunkSignal = pyqtSignal()
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Process")
@@ -31,7 +32,7 @@ class ProcessWindow(QWidget):
         self.cash_data_sended = False
         self.penalty_time_cost = 2000
         self.vip_client = False
-        
+        self.asyncFunkSignal.connect(self.fetch_config_data, Qt.QueuedConnection)
         # Config faylidan ma'lumotlarni yuklash
         self.config = Config()
         self.process_data = self.config.config_data["options"]
@@ -116,22 +117,22 @@ class ProcessWindow(QWidget):
         self.timer_intervent = 100
         self.timer.start(self.timer_intervent)
         
-        self.httptimer = QTimer(self)
-        self.httptimer.timeout.connect(self.fetch_config_data)
-        self.httptimer.start(24 * 3600 * 1000) # 24 soat#
+        # self.httptimer = QTimer(self)
+        # self.httptimer.timeout.connect(self.fetch_config_data)
+        # self.httptimer.start(24 * 3600 * 1000) # 24 soat#
         self.penalty_process = False
         self.timer_ads = 0.0
         self.browser_process = None
         self.browser_opened = False
 
-    def fetch_config_data(self):
+    async def fetch_config_data(self):
         if self.in_option or self.pause_clicked or self.vip_client:
             return
-        asyncio.run(self.config.update_config())
-        # await self.config.update_config()
-        self.process_data = self.config.config_data["options"]
+        config = await self.config.fetch_config_data()
+        self.process_data = config["options"]
         self.pause_time = float(self.config.pause_time)
         self.penalty_time_cost = self.config.penalty_cost
+        print("Fetch config data successful!")
         
     def setWindowSize(self, size):
         self.setGeometry(0, 0, size.width(), size.height())
