@@ -60,6 +60,9 @@ class DataBase():
             penalty_cost = carwash["penalty_cost"]
             currency = carwash["currency"]
             currency_rate = carwash["currency_rate"]
+            options = carwash['options']
+            for option in options:
+                self.update_option(option)
             cursor = self.connection.cursor()
             cursor.execute(
                 """
@@ -71,6 +74,7 @@ class DataBase():
                 (username, password, device_id, url_config, url_cash, pause_time, penalty_cost, currency, currency_rate, username)
             )
             self.connection.commit()
+            print('Success carwash update!')
             self.connection.close()
         except Exception as e:
             print(e)
@@ -122,13 +126,14 @@ class DataBase():
                 }
                 options.append(optoin_dict)
             self.connection.close()
-        except:
+        except Exception as e:
+            print(e)
             return None
         return options
 
     def update_option(self, option: dict) -> dict:
         try:
-            self.connect()
+            # self.connect()
             name = option["name"]
             btn_port = option["btn_port"]
             relay_port = option["relay_port"]
@@ -145,9 +150,11 @@ class DataBase():
                 """,
                 (name, relay_port, btn_port, status, on_time, off_time, price, relay_port)
             )
-            self.connection.commit()
-            self.connection.close()
-        except:
+            print('Success update option')
+            # self.connection.commit()
+            # self.connection.close()
+        except Exception as e:
+            print(e)
             return None
         return option
 
