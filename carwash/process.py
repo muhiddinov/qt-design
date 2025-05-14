@@ -118,7 +118,7 @@ class ProcessWindow(QWidget):
         
         self.httptimer = QTimer(self)
         self.httptimer.timeout.connect(self.fetch_config_data)
-        self.httptimer.start(5000) # 24 soat#
+        self.httptimer.start(24 * 3600) # 24 soat#
         self.penalty_process = False
         self.timer_ads = 0.0
         self.browser_process = None
