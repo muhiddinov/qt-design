@@ -2,7 +2,7 @@ import sys
 import RPi.GPIO as GPIO
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
 from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt, QTimer, QTime, pyqtSignal
+from PyQt5.QtCore import Qt, QTimer, QTime
 import time
 from utils import Config
 import threading
@@ -11,7 +11,6 @@ import subprocess
 
 
 class ProcessWindow(QWidget):
-    asyncFunkSignal = pyqtSignal()
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Process")
@@ -32,10 +31,10 @@ class ProcessWindow(QWidget):
         self.cash_data_sended = False
         self.penalty_time_cost = 2000
         self.vip_client = False
-        self.asyncFunkSignal.connect(self.fetch_config_data, Qt.QueuedConnection)
-        self.asyncFunkSignal.emit()
+        
         # Config faylidan ma'lumotlarni yuklash
         self.config = Config()
+        self.config.setCallback(self.update_config)
         self.process_data = self.config.config_data["options"]
         self.output_pins = self.config.relay_pins
         self.input_pins = self.config.button_pins
@@ -47,8 +46,6 @@ class ProcessWindow(QWidget):
         self.last_option = self.process_data[0]
         self.penalty_time_cost = self.config.penalty_cost
         self.last_save_counter = 0
-        asyncio.run(self.config.update_config())
-        self.process_data = self.config.config_data["options"]
 
         if self.cash_sum > 100:
             self.pause_clicked = True
@@ -118,22 +115,23 @@ class ProcessWindow(QWidget):
         self.timer_intervent = 100
         self.timer.start(self.timer_intervent)
         
-        # self.httptimer = QTimer(self)
-        # self.httptimer.timeout.connect(self.fetch_config_data)
-        # self.httptimer.start(24 * 3600 * 1000) # 24 soat#
+        self.httptimer = QTimer(self)
+        self.httptimer.timeout.connect(self.fetch_config_data)
+        self.httptimer.start(24 * 3600 * 1000) # 24 soat#
         self.penalty_process = False
         self.timer_ads = 0.0
         self.browser_process = None
         self.browser_opened = False
 
-    async def fetch_config_data(self):
-        if self.in_option or self.pause_clicked or self.vip_client:
-            return
-        config = await self.config.fetch_config_data()
-        self.process_data = config["options"]
+    def update_config(self):
+        self.process_data = self.config.config_data["options"]
         self.pause_time = float(self.config.pause_time)
         self.penalty_time_cost = self.config.penalty_cost
-        print("Fetch config data successful!")
+
+    def fetch_config_data(self):
+        if self.in_option or self.pause_clicked or self.vip_client:
+            return
+        asyncio.run(self.config.fetch_config_data())
         
     def setWindowSize(self, size):
         self.setGeometry(0, 0, size.width(), size.height())

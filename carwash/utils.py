@@ -28,6 +28,7 @@ class Config:
         self.penalty_cost = carwash['penalty_cost']
         self.currency = carwash['currency']
         self.currency_rate = carwash['currency_rate']
+        self.callback = None
                 
     def save_config(self, config: dict) -> dict | None:
         try:
@@ -74,6 +75,9 @@ class Config:
             return {"Error": str(e)}
         return data
     
+    def setCallback(self, callback):
+        self.callback = callback
+    
     async def fetch_config_data(self) -> dict:
         url = self.url_config + self.device_id
         auth = aiohttp.BasicAuth(self.username, self.password)
@@ -104,20 +108,15 @@ class Config:
                                         break
                         if resp_data['pauseTime'] is not None:
                             self.pause_time = resp_data['pauseTime']
-                            # if self.pause_time == 0:
-                            #     self.pause_time = 180
-                            # self.pause_time = 60 if self.pause_time < 60 else self.pause_time                                
                         if resp_data['penaltyCost'] is not None:
                             self.penalty_cost = resp_data['penaltyCost']
-                            # if self.penalty_cost == 0:
-                            #     self.penalty_cost = 2000
-                            # self.penalty_cost = 500 if self.penalty_cost < 500 else self.penalty_cost
                         myconfig['options'] = options
                         myconfig['pause_time'] = self.pause_time
                         myconfig['penalty_cost'] = self.penalty_cost
                         self.save_config(config=myconfig)
                         self.config_data = myconfig
-                        # print(json.dumps(self.config_data, indent=4))
+                        if self.callback:
+                            self.callback()
                         return myconfig
                     else:
                         print(f"Failed to fetch config data. Status code: {response.status}")
